@@ -387,7 +387,7 @@ ConROC:UpdateSpellID()
 			return MM_Ability.RapidFire;
 		end
 		
-		if (ConROC_AoEButton:IsVisible() or ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and multiRDY then
+		if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and multiRDY then
 			return _MultiShot;
 		end
 		

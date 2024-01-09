@@ -1,4 +1,6 @@
-Ver 2.0.2
+Ver 1.15.1
+	-Corrected the check for Multi-Shot, to only show if AoE rotation is used
+Ver 1.15.0
 	-Support for Classic
 	-Started to add support for translations.
 Ver 1.13.11

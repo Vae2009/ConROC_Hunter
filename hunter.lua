@@ -305,12 +305,12 @@ ConROC:UpdateSpellID()
 		
 --Conditions	
 	local targetPh 											= ConROC:PercentHealth('target');
-	local summoned 											= ConROC:CallPet();
+	--local summoned 											= ConROC:CallPet();
 	local isClose 											= CheckInteractDistance('target', 3);
 	local moving 											= ConROC:PlayerSpeed();	
 	local incombat 											= UnitAffectingCombat('player');
 	local inShotRange										= ConROC:IsSpellInRange(_AutoShot, 'target');
-	local cPetRDY											= GetCallPetSpellInfo();
+	--local cPetRDY											= GetCallPetSpellInfo();
 	local inMelee											= isClose
 	local tarHasMana 										= UnitPower('target', Enum.PowerType.Mana);
 	
@@ -341,9 +341,9 @@ ConROC:UpdateSpellID()
 	ConROC:AbilityRaidBuffs(_TrueshotAura, tsAuraRDY and not tsABUFF);
 	
 --Warnings
-	if cPetRDY and not summoned and incombat then
+--[[	if cPetRDY and not summoned and incombat then
 		ConROC:Warnings("Call your pet!!!", true);
-	end
+	end]]
 
 --Rotations
 	if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and hMarkRDY and not hmDEBUFF and not inMelee then
@@ -475,7 +475,7 @@ function ConROC.Hunter.Defense(_, timeShift, currentSpell, gcd)
 	local disenRDY											= ConROC:AbilityReady(_Disengage, timeShift);
 	local fDeathRDY											= ConROC:AbilityReady(Surv_Ability.FeignDeath, timeShift);
 
-	local aotMonkey											= ConROC:AbilityReady(BM_Ability.AspectoftheMonkey, timeShift);
+	local aotMonkeyRDY											= ConROC:AbilityReady(BM_Ability.AspectoftheMonkey, timeShift);
 		local aotmForm											= ConROC:Form(BM_Ability.AspectoftheMonkey);
 	local aotWild											= ConROC:AbilityReady(_AspectoftheWild, timeShift);
 		local aotwForm											= ConROC:Form(_AspectoftheWild);
@@ -504,7 +504,7 @@ function ConROC.Hunter.Defense(_, timeShift, currentSpell, gcd)
 		return _Disengage;
 	end
 	
-	if aotMonkey and not aotmForm and inMelee and ConROC:TarYou() then
+	if aotMonkeyRDY and not aotmForm and inMelee and ConROC:TarYou() then
 		return BM_Ability.AspectoftheMonkey;
 	end
 	

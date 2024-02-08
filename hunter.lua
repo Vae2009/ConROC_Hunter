@@ -11,7 +11,9 @@ ConROC.Hunter = {};
 
 local ConROC_Hunter, ids = ...;
 local optionMaxIds = ...;
-local currentSpecName
+local currentSpecName;
+local currentSpecID;
+local AutoShotActive = false;
 
 function ConROC:EnableDefenseModule()
 	self.NextDef = ConROC.Hunter.Defense;
@@ -21,44 +23,36 @@ function ConROC:UNIT_SPELLCAST_SUCCEEDED(event, unitID, lineID, spellID)
 	if unitID == 'player' then
 		self.lastSpellId = spellID;
 	end
+	ConROC:JustCasted(spellID);
 end
 
 function ConROC:PopulateTalentIDs()
     local numTabs = GetNumTalentTabs()
     
     for tabIndex = 1, numTabs do
-        local tabName = GetTalentTabInfo(tabIndex) .. "_Talent"
-        tabName = string.gsub(tabName, "%s", "") -- Remove spaces from tab name
-        if printTalentsMode then
-        	print(tabName..": ")
-        else
-        	ids[tabName] = {}
-    	end
-        
+        local tabName = GetTalentTabInfo(tabIndex)
+        tabName = string.gsub(tabName, "[^%w]", "") .. "_Talent" -- Remove spaces from tab name
+        print("ids."..tabName.." = {")
         local numTalents = GetNumTalents(tabIndex)
 
         for talentIndex = 1, numTalents do
             local name, _, _, _, _ = GetTalentInfo(tabIndex, talentIndex)
 
             if name then
-                local talentID = string.gsub(name, "%s", "") -- Remove spaces from talent name
-                if printTalentsMode then
-                	print(talentID .." = ID no: ", talentIndex)
-                else
-                	ids[tabName][talentID] = talentIndex
-                end
+                local talentID = string.gsub(name, "[^%w]", "") -- Remove spaces from talent name
+                    print(talentID .." = ", talentIndex ..",")
             end
         end
+        print("}")
     end
-    if printTalentsMode then printTalentsMode = false end
 end
-ConROC:PopulateTalentIDs()
 
 local Racial, Spec, BM_Ability, BM_Talent, MM_Ability, MM_Talent, Surv_Ability, Surv_Talent, Pet, Player_Buff, Player_Debuff, Target_Debuff = ids.Racial, ids.Spec, ids.BM_Ability, ids.BeastMastery_Talent, ids.MM_Ability, ids.Marksmanship_Talent, ids.Surv_Ability, ids.Survival_Talent, ids.Pet, ids.Player_Buff, ids.Player_Debuff, ids.Target_Debuff;
 
 
 function ConROC:SpecUpdate()
 	currentSpecName = ConROC:currentSpec()
+    currentSpecID = ConROC:currentSpec("ID")
 
 	if currentSpecName then
 	   ConROC:Print(self.Colors.Info .. "Current spec:", self.Colors.Success ..  currentSpecName)
@@ -86,8 +80,8 @@ end
 --Ranks
 --Beast Mastery
 
-local _AspectoftheBeast = BM_Ability.AspectoftheBeast
-local _AspectoftheCheetah = BM_Ability.AspectoftheCheetah
+local _AspectoftheBeast = BM_Ability.AspectoftheBeast;
+local _AspectoftheCheetah = BM_Ability.AspectoftheCheetah;
 local _AspectoftheHawk = BM_Ability.AspectoftheHawkRank1;
 local _AspectoftheMonkey = BM_Ability.AspectoftheMonkey;
 local _AspectofthePack = BM_Ability.AspectofthePack;
@@ -123,6 +117,14 @@ local _MongooseBite = Surv_Ability.MongooseBiteRank1;
 local _RaptorStrike = Surv_Ability.RaptorStrikeRank1;
 local _WingClip = Surv_Ability.WingClipRank1;
 local _WyvernSting = Surv_Ability.WyvernStingRank1;
+
+--Rune
+local _HeartoftheLion = ids.Runes.HeartoftheLion;
+local _Carve = ids.Runes.Carve;
+local _ChimeraShot = ids.Runes.ChimeraShot;
+local _ExplosiveShot = ids.Runes.ExplosiveShot;
+local _FlankingStrike = ids.Runes.FlankingStrike;
+local _KillCommand = ids.Runes.KillCommand;
 
 function ConROC:UpdateSpellID()
 --Beast Mastery
@@ -248,6 +250,13 @@ MongooseBite = _MongooseBite,
 RaptorStrike = _RaptorStrike,
 WingClip = _WingClip,
 WyvernSting = _WyvernSting,
+--Runes
+HeartoftheLion = _HeartoftheLion,
+Carve = _Carve,
+ChimeraShot = _ChimeraShot,
+ExplosiveShot = _ExplosiveShot,
+FlankingStrike = _FlankingStrike,
+KillCommand = _KillCommand,
 }
 end
 ConROC:UpdateSpellID()
@@ -302,10 +311,22 @@ ConROC:UpdateSpellID()
 		local aotcForm											= ConROC:Form(_AspectoftheCheetah);
 	local aotPack											= ConROC:AbilityReady(_AspectofthePack, timeShift);
 		local aotpForm											= ConROC:Form(_AspectofthePack);
+
+--Runes
+	local hotLionRDY 										= ConROC:AbilityReady(_HeartoftheLion, timeShift);
+		local hotLionBUFF 										= ConROC:Buff(_HeartoftheLion, timeShift);
+	local carveRDY 											= ConROC:AbilityReady(_Carve, timeShift);
+	local cShotRDY 											= ConROC:AbilityReady(_ChimeraShot, timeShift);
+	local expShotRDY 										= ConROC:AbilityReady(_ExplosiveShot, timeShift);
+		local expShotDEBUFF 									= ConROC:TargetDebuff(_ExplosiveShot, timeShift);
+	local fStrikeRDY 										= ConROC:AbilityReady(_FlankingStrike, timeShift);
+		local fStrikeBUFF, _, fStrikeCOUNT						= ConROC:Buff(_FlankingStrike, timeShift);
+	local kCommandRDY 										= ConROC:AbilityReady(_KillCommand, timeShift);
 		
 --Conditions	
 	local targetPh 											= ConROC:PercentHealth('target');
-	--local summoned 											= ConROC:CallPet();
+	local summoned 											= ConROC:CallPet();
+	local assist 											= ConROC:PetAssist();
 	local isClose 											= CheckInteractDistance('target', 3);
 	local moving 											= ConROC:PlayerSpeed();	
 	local incombat 											= UnitAffectingCombat('player');
@@ -313,7 +334,8 @@ ConROC:UpdateSpellID()
 	--local cPetRDY											= GetCallPetSpellInfo();
 	local inMelee											= isClose
 	local tarHasMana 										= UnitPower('target', Enum.PowerType.Mana);
-	
+	local isEnemy                                           = ConROC:TarHostile();
+
 	if IsSpellKnown(_WingClip) then
 		inMelee												= ConROC:IsSpellInRange(_WingClip, 'target');
 	end
@@ -346,6 +368,99 @@ ConROC:UpdateSpellID()
 	end]]
 
 --Rotations
+	--[[
+	if ConROC.Seasons.IsSoD then --DPS rotation for SoD
+		if currentSpecID == ids.Spec.BeastMastery then
+			if isEnemy and ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and hMarkRDY and not hmDEBUFF and not inMelee then
+				return _HuntersMark;
+			end
+		end
+		if currentSpecID == ids.Spec.Marksmanship then
+		end
+		if currentSpecID == ids.Spec.Survival then
+		end
+	end
+	--]]
+	if ConROC.Seasons.IsSoD then
+			--print("AutoShotActive", AutoShotActive);
+		if hotLionRDY and not hotLionBUFF then
+			return _HeartoftheLion
+		end
+		if kCommandRDY and summoned then
+			return _KillCommand
+		end
+		if not assist and summoned and incombat then
+			ConROC:Warnings("Pet is NOT attacking!!!", true);		
+		end
+		if inShotRange then
+			if ConROC:CheckBox(ConROC_SM_Role_Melee) then
+				if autoShot and not AutoShotActive then
+					return _AutoShot;
+				end
+				if ConROC_AoEButton:IsVisible() and multiRDY then
+					return _MultiShot
+				end
+				if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and sStingRDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+					return _SerpentSting;
+				end
+			end
+			if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and hMarkRDY and not hmDEBUFF and not inMelee then
+				return _HuntersMark;
+			end	
+			if ConROC:CheckBox(ConROC_SM_Sting_Viper) and vStingRDY and not stingUp and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+				return _ViperSting;
+			end
+			
+			if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and sStingRDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+				return _SerpentSting;
+			end
+			
+			if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and scStingRDY and not stingUp and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+				return _ScorpidSting;
+			end
+			if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and aimShotRDY and currentSpell ~= _AimedShot then
+				return _AimedShot;
+			end
+			if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and multiRDY then
+				return _MultiShot;
+			end		
+			if arcShotRDY and currentSpell ~= _AimedShot and ((manaPercent >= 50) or moving or ((targetPh <= 5 and ConROC:Raidmob()) or (targetPh <= 20 and not ConROC:Raidmob()))) then
+				return _ArcaneShot;
+			end
+			if autoShot and not AutoShotActive then
+				return _AutoShot;
+			end
+		end
+		if inMelee then
+			AutoShotActive = false;
+			if fStrikeRDY then
+				return _FlankingStrike;
+			end
+			if rStrikeRDY then
+				return _RaptorStrike
+			end
+			if cAttackRDY then
+				return _Counterattack;
+			end
+		
+			if mBiteRDY then
+				return _MongooseBite;
+			end
+			if carveRDY then
+				return _Carve;
+			end
+			
+			if ConROC:CheckBox(ConROC_SM_Stun_WingClip) and wClipRDY and not wClipDEBUFF then
+				return _WingClip;
+			end
+			
+			if rStrikeRDY then
+				return _RaptorStrike;
+			end
+		end
+		return nil
+	end
+	--not SoD
 	if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and hMarkRDY and not hmDEBUFF and not inMelee then
 		return _HuntersMark;
 	end	
@@ -400,7 +515,7 @@ ConROC:UpdateSpellID()
 		end
 		
 		if autoShot then
-			return ids.MM_Ability.AutoShot;
+			return _AutoShot;
 		end
 	end
 
@@ -521,4 +636,13 @@ function ConROC.Hunter.Defense(_, timeShift, currentSpell, gcd)
 	end
 	
 	return nil;
+end
+
+function ConROC:JustCasted(spellID)
+    if spellID == (_AutoShot or _SerpentSting) then
+        AutoShotActive = true;
+    end
+    if spellID ~= (_AutoShot or _SerpentSting) then
+        AutoShotActive = false;
+    end
 end

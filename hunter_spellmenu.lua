@@ -28,6 +28,12 @@ local defaults = {
 	["ConROC_Ranged_Ability_HuntersMark"] = true,
 	["ConROC_Ranged_Ability_RapidFire"] = true,
 	["ConROC_Ranged_Ability_BestialWrath"] = true,
+	["ConROC_SM_Role_PvP"] = false,
+
+	["ConROC_PvP_Sting_Serpent"] = true,
+	["ConROC_PvP_Ability_HuntersMark"] = true,
+	["ConROC_PvP_Ability_RapidFire"] = true,
+	["ConROC_PvP_Ability_BestialWrath"] = true,
 }
 
 
@@ -108,12 +114,12 @@ function ConROC:SpellmenuClass()
 		disabledTexture = ConROC.Textures.Ranged_disabled,
 		role = "ConROC_SM_Role_Ranged",
 		},
---[[	{
+		{
 		frameName = "Melee",
 		activeTexture = ConROC.Textures.Melee,
 		disabledTexture = ConROC.Textures.Melee_disabled,
 		role = "ConROC_SM_Role_Melee",
-		},--]]
+		},
 		{
 		frameName = "PvP",
 		activeTexture = ConROC.Textures.PvP,
@@ -136,6 +142,7 @@ function ConROC:SpellmenuClass()
 	    frameName = "Abilities",
 	    spells = {
 	    	{spellID = ids.optionMaxIds.HuntersMark, spellCheckbox = "Ability_HuntersMark", reqLevel = 6, type="spell"},
+	    	{spellID = ids.optionMaxIds.ChimeraShot, spellCheckbox = "Ability_ChimeraShot", reqLevel = 1, type="spell"},
 	    	{spellID = ids.optionMaxIds.MultiShot, spellCheckbox = "Ability_MultiShot", reqLevel = 18, type="spell"},
 	    	{spellID = ids.optionMaxIds.AimedShot, spellCheckbox = "Ability_AimedShot", reqLevel = 20, type="spell"},
 	    	{spellID = ids.optionMaxIds.RapidFire, spellCheckbox = "Ability_RapidFire", reqLevel = 26, type="spell"},
@@ -157,7 +164,7 @@ function ConROC:SpellmenuClass()
 	  {
 	    frameName = "Options",
 	    spells = {
-		    {spellID = "AoE Toggle Button", spellCheckbox = "Option_AoE", reqLevel = 20, type="aoetoggler"},
+		    {spellID = "AoE Toggle Button", spellCheckbox = "Option_AoE", reqLevel = 18, type="aoetoggler"},
 	    }
 	  }
 	}
@@ -495,12 +502,12 @@ function ConROC:OptionRadioButtonSpell(_spellData, i, j, _spellFrame, _radioButt
 			for _, radioButton in ipairs(_radioButtonsTable) do
 				if radioButton ~= self then
 					radioButton:SetChecked(false)
-					ConROCWarlockSpells[checkboxName .. radioButton.spellCheckbox] = radioButton:GetChecked()
+					ConROCHunterSpells[checkboxName .. radioButton.spellCheckbox] = radioButton:GetChecked()
 					
 				else
 					-- Perform any additional logic based on the selected button
 					self:SetChecked(true)
-					ConROCWarlockSpells[checkboxName .. radioButton.spellCheckbox] = self:GetChecked()
+					ConROCHunterSpells[checkboxName .. radioButton.spellCheckbox] = self:GetChecked()
 					
 				end
 			end
@@ -765,6 +772,8 @@ function ConROC:OptionNone(_spellData, i, j, _spellFrame, _checkType, _radioButt
 end
 
 function ConROC:SpellMenuUpdate(newSpell)
+	--print("ConROC.SpellsChanged",ConROC.SpellsChanged)
+	--if newSpell then ConROC:UpdateSpellID() end
     lastFrame = ConROCScrollChild;
     local anyHLVisible = false;
     scrollHeight = 0;
@@ -799,7 +808,7 @@ function ConROC:SpellMenuUpdate(newSpell)
                         oItem:SetPoint("TOPLEFT", lFrame, "BOTTOMLEFT", 0, 0);
                     end
                     if type(_spellData.spellID) == "number" then
-                        if plvl >= _spellData.reqLevel and IsSpellKnown(_spellData.spellID) then
+                        if plvl >= _spellData.reqLevel and (IsSpellKnown(_spellData.spellID) or IsSpellKnownOrOverridesKnown(_spellData.spellID)) then
                             lFrame = oItem;
                             lFrame:Show();
                             if oItem:IsShown() then
@@ -917,7 +926,7 @@ function ConROC:SpellMenuUpdate(newSpell)
                     else
                         oItem:SetPoint("TOPLEFT", lFrame, "BOTTOMLEFT", 0, 0);
                     end
-                    if plvl >= _spellData.reqLevel and IsSpellKnown(_spellData.spellID) then                                                    
+                    if plvl >= _spellData.reqLevel and (IsSpellKnown(_spellData.spellID) or IsSpellKnownOrOverridesKnown(_spellData.spellID)) then
                         lFrame = oItem;
                         lFrame:Show();
                             if oItem:IsShown() then

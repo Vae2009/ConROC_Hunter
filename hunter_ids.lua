@@ -42,6 +42,24 @@ local ConROC_Hunter, ids = ...;
 		ScareBeastRank2 = 14326,
 		ScareBeastRank3 = 14327,	
 	}
+	ids.BeastMastery_Talent = { 
+		ImprovedAspectoftheMonkey =  1, 
+		ImprovedAspectoftheHawk =  2, 
+		Pathfinding =  3, 
+		ImprovedMendPet =  4, 
+		BestialWrath =  5, 
+		Intimidation =  6, 
+		SpiritBond =  7, 
+		EnduranceTraining =  8, 
+		BestialDiscipline =  9, 
+		BestialSwiftness =  10, 
+		Ferocity =  11, 
+		ThickHide =  12, 
+		UnleashedFury =  13, 
+		Frenzy =  14, 
+		ImprovedEyesoftheBeast =  15, 
+		ImprovedRevivePet =  16, 
+	}
 --Marksmanship
 	ids.MM_Ability = {
 		AimedShotRank1 = 19434,
@@ -99,6 +117,22 @@ local ConROC_Hunter, ids = ...;
 		VolleyRank2 = 14294,
 		VolleyRank3 = 14295,
 	}
+	ids.Marksmanship_Talent = { 
+		ImprovedConcussiveShot =  1, 
+		Efficiency =  2, 
+		ImprovedHuntersMark =  3, 
+		LethalShots =  4, 
+		AimedShot =  5, 
+		ImprovedArcaneShot =  6, 
+		Barrage =  7, 
+		ImprovedSerpentSting =  8, 
+		MortalShots =  9, 
+		ImprovedScorpidSting =  10, 
+		HawkEye =  11, 
+		ScatterShot =  12, 
+		TrueshotAura =  13, 
+		RangedWeaponSpecialization =  14, 
+	}
 --Survival
 	ids.Surv_Ability = {
 		CounterattackRank1 = 19306,
@@ -148,6 +182,39 @@ local ConROC_Hunter, ids = ...;
 		WyvernStingRank1 = 19386,
 		WyvernStingRank2 = 24132,		
 		WyvernStingRank3 = 24133,
+	}
+	ids.Survival_Talent = { 
+		HumanoidSlaying =  1, 
+		LightningReflexes =  2, 
+		Entrapment =  3, 
+		ImprovedWingClip =  4, 
+		CleverTraps =  5, 
+		Deterrence =  6, 
+		ImprovedFeignDeath =  7, 
+		Surefooted =  8, 
+		Deflection =  9, 
+		Counterattack =  10, 
+		KillerInstinct =  11, 
+		TrapMastery =  12, 
+		WyvernSting =  13, 
+		SavageStrikes =  14, 
+		Survivalist =  15, 
+		MonsterSlaying =  16, 
+	}
+	ids.Runes = {
+		HeartoftheLion = 409580, --buff
+		LoneWolf = 415370,  --passive
+		MasterMarksman = 409428, --passive
+		BeastMastery = 409368, --passive
+		Carve = 425711,
+		ChimeraShot = 409433,
+		ExplosiveShot = 409552, --debuffs
+		FlankingStrike = 415320, --buffs stack up to 3 times
+		KillCommand = 409379,
+		SerpentSpread = 425738, --passive
+		SniperTraining = 415399, --passive
+		MeleeSpecialist = 415352, --Phase 2 - passive
+		TrapLauncher = 409541, --Phase 2 - Passive
 	}
 --Pet
 	ids.Pet = {

@@ -327,12 +327,11 @@ ConROC:UpdateSpellID()
 	local targetPh 											= ConROC:PercentHealth('target');
 	local summoned 											= ConROC:CallPet();
 	local assist 											= ConROC:PetAssist();
-	local isClose 											= ConROC:IsMeleeRange()--CheckInteractDistance('target', 3);
+	local inMelee 											= ConROC:IsMeleeRange()--CheckInteractDistance('target', 3);
 	local moving 											= ConROC:PlayerSpeed();	
 	local incombat 											= UnitAffectingCombat('player');
 	local inShotRange										= ConROC:IsSpellInRange(_AutoShot, 'target');
 	--local cPetRDY											= GetCallPetSpellInfo();
-	local inMelee											= isClose
 	local tarHasMana 										= UnitPower('target', Enum.PowerType.Mana);
 	local isEnemy                                           = ConROC:TarHostile();
 
@@ -600,8 +599,7 @@ function ConROC.Hunter.Defense(_, timeShift, currentSpell, gcd)
 	local summoned 											= ConROC:CallPet();	
 	local petPh												= ConROC:PercentHealth('pet');
 	local incombat 											= UnitAffectingCombat('player');
-	local isClose 											= CheckInteractDistance('target', 3);	
-	local inMelee											= isClose
+	local inMelee 											= ConROC:IsMeleeRange()--CheckInteractDistance('target', 3);
 	
 	if IsSpellKnown(_WingClip) then
 		inMelee											= ConROC:IsSpellInRange(_WingClip, 'target');

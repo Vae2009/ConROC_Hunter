@@ -327,7 +327,7 @@ ConROC:UpdateSpellID()
 	local targetPh 											= ConROC:PercentHealth('target');
 	local summoned 											= ConROC:CallPet();
 	local assist 											= ConROC:PetAssist();
-	local isClose 											= CheckInteractDistance('target', 3);
+	local isClose 											= ConROC:IsMeleeRange()--CheckInteractDistance('target', 3);
 	local moving 											= ConROC:PlayerSpeed();	
 	local incombat 											= UnitAffectingCombat('player');
 	local inShotRange										= ConROC:IsSpellInRange(_AutoShot, 'target');

@@ -134,7 +134,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 	local _AutoShot, _AutoShot_RDY = ConROC:AbilityReady(Ability.AutoShot, timeShift);
 	local _ConcussiveShot, _ConcussiveShot_RDY = ConROC:AbilityReady(Ability.ConcussiveShot, timeShift);
 	local _HuntersMark, _HuntersMark_RDY = ConROC:AbilityReady(Ability.HuntersMark, timeShift);
-		local _, _, _, _HuntersMark_DEBUFF = ConROC:TargetAura(_HuntersMark);
+		local _, _, _, _HuntersMark_UP = ConROC:TargetAura(_HuntersMark);
 	local _MultiShot, _MultiShot_RDY = ConROC:AbilityReady(Ability.MultiShot, timeShift);
 	local _RapidFire, _RapidFire_RDY = ConROC:AbilityReady(Ability.RapidFire, timeShift);
 		local _RapidFire_BUFF = ConROC:Aura(_RapidFire);
@@ -176,6 +176,9 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 		local _FlankingStrike_BUFF, _FlankingStrike_COUNT = ConROC:Aura(_FlankingStrike, timeShift);
 	local _KillCommand, _KillCommand_RDY = ConROC:AbilityReady(Runes.KillCommand, timeShift);
 
+	if _HuntersMark_UP then
+		print("Hunter Mark UP")
+	end
 --Conditions
 	local _Pet_summoned = ConROC:CallPet();
 	local _Pet_assist = ConROC:PetAssist();
@@ -218,7 +221,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 --Rotations
 	if ConROC.Seasons.IsSoD then --DPS rotation for SoD
 		if currentSpecID == ids.Spec.BeastMastery then
-			if _is_Enemy and ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_DEBUFF and not _target_in_melee then
+			if _is_Enemy and ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_UP and not _target_in_melee then
 				return _HuntersMark;
 			end
 		end
@@ -249,7 +252,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 					return _SerpentSting;
 				end
 			end
-			if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_DEBUFF and not _target_in_melee then
+			if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_UP and not _target_in_melee then
 				return _HuntersMark;
 			end	
 			if ConROC:CheckBox(ConROC_SM_Sting_Viper) and _ViperSting_RDY and not stingUp and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
@@ -306,7 +309,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 		return nil
 	end
 	--not SoD
-	if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_DEBUFF and not _target_in_melee then
+	if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_UP and not _target_in_melee then
 		return _HuntersMark;
 	end
 

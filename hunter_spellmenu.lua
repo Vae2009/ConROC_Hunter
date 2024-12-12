@@ -902,7 +902,7 @@ function ConROC:SpellMenuUpdate(newSpell)
                     _spellFrame:SetHeight(spellFrameHeight);
                 end
             end
-            
+
             if anyChildVisible then
                     --print("-- FRAME to show", frame:GetName())
                     if i > firstHeadline then scrollHeight = scrollHeight + 10; end

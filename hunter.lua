@@ -176,9 +176,6 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 		local _FlankingStrike_BUFF, _FlankingStrike_COUNT = ConROC:Aura(_FlankingStrike, timeShift);
 	local _KillCommand, _KillCommand_RDY = ConROC:AbilityReady(Runes.KillCommand, timeShift);
 
-	if _HuntersMark_UP then
-		print("Hunter Mark UP")
-	end
 --Conditions
 	local _Pet_summoned = ConROC:CallPet();
 	local _Pet_assist = ConROC:PetAssist();

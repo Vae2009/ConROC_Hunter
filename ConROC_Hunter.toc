@@ -1,7 +1,7 @@
 ## Title:-|cffFFFFFFConROC|r- |cffABD473Hunter|r
-## Version: 1.15.3
-## Author: Vae, 1.15.3 updated by Lith
-## Interface: 11501
+## Version: 1.15.10
+## Author: Vae
+## Interface: 11505
 ## SavedVariablesPerCharacter: ConROCHunterSpells
 ## Dependencies: ConROC
 ## LoadOnDemand: 1

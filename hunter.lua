@@ -1,19 +1,8 @@
-local printTalentsMode = false
-
--- Slash command for printing talent tree with talent names and ID numbers
-SLASH_CONROCPRINTTALENTS1 = "/ConROCPT"
-SlashCmdList["CONROCPRINTTALENTS"] = function()
-    printTalentsMode = not printTalentsMode
-    ConROC:PopulateTalentIDs()
-end
-
 ConROC.Hunter = {};
 
 local ConROC_Hunter, ids = ...;
-local optionMaxIds = ...;
 local currentSpecName;
 local currentSpecID;
-local AutoShotActive = false;
 
 function ConROC:EnableDefenseModule()
 	self.NextDef = ConROC.Hunter.Defense;
@@ -23,12 +12,13 @@ function ConROC:UNIT_SPELLCAST_SUCCEEDED(event, unitID, lineID, spellID)
 	if unitID == 'player' then
 		self.lastSpellId = spellID;
 	end
+
 	ConROC:JustCasted(spellID);
 end
 
 function ConROC:PopulateTalentIDs()
     local numTabs = GetNumTalentTabs()
-    
+
     for tabIndex = 1, numTabs do
         local tabName = GetTalentTabInfo(tabIndex)
         tabName = string.gsub(tabName, "[^%w]", "") .. "_Talent" -- Remove spaces from tab name
@@ -47,8 +37,8 @@ function ConROC:PopulateTalentIDs()
     end
 end
 
-local Racial, Spec, BM_Ability, BM_Talent, MM_Ability, MM_Talent, Surv_Ability, Surv_Talent, Pet, Player_Buff, Player_Debuff, Target_Debuff = ids.Racial, ids.Spec, ids.BM_Ability, ids.BeastMastery_Talent, ids.MM_Ability, ids.Marksmanship_Talent, ids.Surv_Ability, ids.Survival_Talent, ids.Pet, ids.Player_Buff, ids.Player_Debuff, ids.Target_Debuff;
-
+local Racial, Spec, Ability, Rank, BM_Talent, MM_Talent, Surv_Talent, Pet, Runes, Buff, Debuff = ids.Racial, ids.Spec, ids.Ability, ids.Rank, ids.BeastMastery_Talent, ids.Marksmanship_Talent, ids.Survival_Talent, ids.Pet, ids.Runes, ids.Buff, ids.Debuff;
+local _AutoShot_ACTIVE = false;
 
 function ConROC:SpecUpdate()
 	currentSpecName = ConROC:currentSpec()
@@ -60,8 +50,9 @@ function ConROC:SpecUpdate()
 	   ConROC:Print(self.Colors.Error .. "You do not currently have a spec.")
 	end
 end
+
 ConROC:SpecUpdate()
-	
+
 function ConROC:EnableRotationModule()
 	self.Description = 'Hunter';
 	self.NextSpell = ConROC.Hunter.Damage;
@@ -69,281 +60,139 @@ function ConROC:EnableRotationModule()
 	self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED');
 	self:RegisterEvent("PLAYER_TALENT_UPDATE");
 	self.lastSpellId = 0;
-	
-	ConROC:SpellmenuClass();
---	ConROCSpellmenuFrame:Hide();	
 end
+
 function ConROC:PLAYER_TALENT_UPDATE()
 	ConROC:SpecUpdate();
     ConROC:closeSpellmenu();
 end
---Ranks
---Beast Mastery
 
-local _AspectoftheBeast = BM_Ability.AspectoftheBeast;
-local _AspectoftheCheetah = BM_Ability.AspectoftheCheetah;
-local _AspectoftheHawk = BM_Ability.AspectoftheHawkRank1;
-local _AspectoftheMonkey = BM_Ability.AspectoftheMonkey;
-local _AspectofthePack = BM_Ability.AspectofthePack;
-local _AspectoftheWild = BM_Ability.AspectoftheWildRank1;
-local _BestialWrath = BM_Ability.BestialWrath;
-local _Intimidation = BM_Ability.Intimidation;
-local _KillCommand = BM_Ability.KillCommand;
-local _ScareBeast = BM_Ability.ScareBeastRank1;
+--Info
+local _Player_Level = UnitLevel("player");
+local _Player_Percent_Health = ConROC:PercentHealth('player');
+local _Pet_Percent_Health = ConROC:PercentHealth('pet');
+local _is_PvP = ConROC:IsPvP();
+local _in_combat = UnitAffectingCombat('player');
+local _party_size = GetNumGroupMembers();
+local _is_PC = UnitPlayerControlled("target");
+local _is_Enemy = ConROC:TarHostile();
+local _Target_Health = UnitHealth('target');
+local _Target_Percent_Health = ConROC:PercentHealth('target');
 
---Marksmanship
-local _AimedShot = MM_Ability.AimedShotRank1;	
-local _ArcaneShot = MM_Ability.ArcaneShotRank1;
-local _AutoShot = ids.MM_Ability.AutoShot;
-local _ConcussiveShot = MM_Ability.ConcussiveShot;
-local _HuntersMark = MM_Ability.HuntersMarkRank1;
-local _MultiShot = MM_Ability.MultiShotRank1;
-local _RapidFire = MM_Ability.RapidFire;
-local _ScatterShot = MM_Ability.ScatterShot;
-local _ScorpidSting = MM_Ability.ScorpidStingRank1;
-local _SerpentSting = MM_Ability.SerpentStingRank1;
-local _SilencingShot = MM_Ability.SilencingShotRank1;
-local _TrueshotAura = MM_Ability.TrueshotAuraRank1;
-local _ViperSting = MM_Ability.ViperStingRank1;
-local _Volley = MM_Ability.VolleyRank1;
-
---Survival
-local _Counterattack = Surv_Ability.CounterattackRank1;
-local _ExplosiveTrap = Surv_Ability.ExplosiveTrapRank1;
-local _FreezingTrap = Surv_Ability.FreezingTrapRank1;
-local _FrostTrap = Surv_Ability.FrostTrap;
-local _ImmolationTrap = Surv_Ability.ImmolationTrapRank1;
-local _MongooseBite = Surv_Ability.MongooseBiteRank1;
-local _RaptorStrike = Surv_Ability.RaptorStrikeRank1;
-local _WingClip = Surv_Ability.WingClipRank1;
-local _WyvernSting = Surv_Ability.WyvernStingRank1;
-
---Rune
-local _HeartoftheLion = ids.Runes.HeartoftheLion;
-local _Carve = ids.Runes.Carve;
-local _ChimeraShot = ids.Runes.ChimeraShot;
-local _ExplosiveShot = ids.Runes.ExplosiveShot;
-local _FlankingStrike = ids.Runes.FlankingStrike;
-local _KillCommand = ids.Runes.KillCommand;
-
-function ConROC:UpdateSpellID()
---Beast Mastery
-if IsSpellKnown(BM_Ability.AspectoftheHawkRank6) then _AspectoftheHawk = BM_Ability.AspectoftheHawkRank6;
-elseif IsSpellKnown(BM_Ability.AspectoftheHawkRank5) then _AspectoftheHawk = BM_Ability.AspectoftheHawkRank5;
-elseif IsSpellKnown(BM_Ability.AspectoftheHawkRank4) then _AspectoftheHawk = BM_Ability.AspectoftheHawkRank4;
-elseif IsSpellKnown(BM_Ability.AspectoftheHawkRank3) then _AspectoftheHawk = BM_Ability.AspectoftheHawkRank3;
-elseif IsSpellKnown(BM_Ability.AspectoftheHawkRank2) then _AspectoftheHawk = BM_Ability.AspectoftheHawkRank2; end
-
-if IsSpellKnown(BM_Ability.AspectoftheWildRank2) then _AspectoftheWild = BM_Ability.AspectoftheWildRank2; end
-
-if IsSpellKnown(BM_Ability.ScareBeastRank3) then _ScareBeast = BM_Ability.ScareBeastRank3;
-elseif IsSpellKnown(BM_Ability.ScareBeastRank2) then _ScareBeast = BM_Ability.ScareBeastRank2; end
-
---Marksmanship
-if IsSpellKnown(MM_Ability.AimedShotRank6) then _AimedShot = MM_Ability.AimedShotRank6;
-elseif IsSpellKnown(MM_Ability.AimedShotRank5) then _AimedShot = MM_Ability.AimedShotRank5;
-elseif IsSpellKnown(MM_Ability.AimedShotRank4) then _AimedShot = MM_Ability.AimedShotRank4;
-elseif IsSpellKnown(MM_Ability.AimedShotRank3) then _AimedShot = MM_Ability.AimedShotRank3;
-elseif IsSpellKnown(MM_Ability.AimedShotRank2) then _AimedShot = MM_Ability.AimedShotRank2; end
-
-if IsSpellKnown(MM_Ability.ArcaneShotRank8) then _ArcaneShot = MM_Ability.ArcaneShotRank8;
-elseif IsSpellKnown(MM_Ability.ArcaneShotRank7) then _ArcaneShot = MM_Ability.ArcaneShotRank7;
-elseif IsSpellKnown(MM_Ability.ArcaneShotRank6) then _ArcaneShot = MM_Ability.ArcaneShotRank6;
-elseif IsSpellKnown(MM_Ability.ArcaneShotRank5) then _ArcaneShot = MM_Ability.ArcaneShotRank5;
-elseif IsSpellKnown(MM_Ability.ArcaneShotRank4) then _ArcaneShot = MM_Ability.ArcaneShotRank4;
-elseif IsSpellKnown(MM_Ability.ArcaneShotRank3) then _ArcaneShot = MM_Ability.ArcaneShotRank3;
-elseif IsSpellKnown(MM_Ability.ArcaneShotRank2) then _ArcaneShot = MM_Ability.ArcaneShotRank2; end
-
-if IsSpellKnown(MM_Ability.HuntersMarkRank4) then _HuntersMark = MM_Ability.HuntersMarkRank4;
-elseif IsSpellKnown(MM_Ability.HuntersMarkRank3) then _HuntersMark = MM_Ability.HuntersMarkRank3;
-elseif IsSpellKnown(MM_Ability.HuntersMarkRank2) then _HuntersMark = MM_Ability.HuntersMarkRank2; end
-
-if IsSpellKnown(MM_Ability.MultiShotRank4) then _MultiShot = MM_Ability.MultiShotRank4;
-elseif IsSpellKnown(MM_Ability.MultiShotRank3) then _MultiShot = MM_Ability.MultiShotRank3;
-elseif IsSpellKnown(MM_Ability.MultiShotRank2) then _MultiShot = MM_Ability.MultiShotRank2; end
-
-if IsSpellKnown(MM_Ability.ScorpidStingRank4) then _ScorpidSting = MM_Ability.ScorpidStingRank4;
-elseif IsSpellKnown(MM_Ability.ScorpidStingRank3) then _ScorpidSting = MM_Ability.ScorpidStingRank3;
-elseif IsSpellKnown(MM_Ability.ScorpidStingRank2) then _ScorpidSting = MM_Ability.ScorpidStingRank2; end
-
-if IsSpellKnown(MM_Ability.SerpentStingRank8) then _SerpentSting = MM_Ability.SerpentStingRank8;
-elseif IsSpellKnown(MM_Ability.SerpentStingRank7) then _SerpentSting = MM_Ability.SerpentStingRank7;
-elseif IsSpellKnown(MM_Ability.SerpentStingRank6) then _SerpentSting = MM_Ability.SerpentStingRank6;
-elseif IsSpellKnown(MM_Ability.SerpentStingRank5) then _SerpentSting = MM_Ability.SerpentStingRank5;
-elseif IsSpellKnown(MM_Ability.SerpentStingRank4) then _SerpentSting = MM_Ability.SerpentStingRank4;
-elseif IsSpellKnown(MM_Ability.SerpentStingRank3) then _SerpentSting = MM_Ability.SerpentStingRank3;
-elseif IsSpellKnown(MM_Ability.SerpentStingRank2) then _SerpentSting = MM_Ability.SerpentStingRank2; end
-
-if IsSpellKnown(MM_Ability.TrueshotAuraRank3) then _TrueshotAura = MM_Ability.TrueshotAuraRank3;
-elseif IsSpellKnown(MM_Ability.TrueshotAuraRank2) then _TrueshotAura = MM_Ability.TrueshotAuraRank2; end
-	
-if IsSpellKnown(MM_Ability.ViperStingRank3) then _ViperSting = MM_Ability.ViperStingRank3;
-elseif IsSpellKnown(MM_Ability.ViperStingRank2) then _ViperSting = MM_Ability.ViperStingRank2; end
-
-if IsSpellKnown(MM_Ability.VolleyRank3) then _Volley = MM_Ability.VolleyRank3;
-elseif IsSpellKnown(MM_Ability.VolleyRank2) then _Volley = MM_Ability.VolleyRank2; end
-
---Survival
-if IsSpellKnown(Surv_Ability.CounterattackRank3) then _Counterattack = Surv_Ability.CounterattackRank3;
-elseif IsSpellKnown(Surv_Ability.CounterattackRank2) then _Counterattack = Surv_Ability.CounterattackRank2; end
-
-if IsSpellKnown(Surv_Ability.ExplosiveTrapRank3) then _ExplosiveTrap = Surv_Ability.ExplosiveTrapRank3;
-elseif IsSpellKnown(Surv_Ability.ExplosiveTrapRank2) then _ExplosiveTrap = Surv_Ability.ExplosiveTrapRank2; end
-
-if IsSpellKnown(Surv_Ability.ImmolationTrapRank5) then _ImmolationTrap = Surv_Ability.ImmolationTrapRank5;
-elseif IsSpellKnown(Surv_Ability.ImmolationTrapRank4) then _ImmolationTrap = Surv_Ability.ImmolationTrapRank4;
-elseif IsSpellKnown(Surv_Ability.ImmolationTrapRank3) then _ImmolationTrap = Surv_Ability.ImmolationTrapRank3;
-elseif IsSpellKnown(Surv_Ability.ImmolationTrapRank2) then _ImmolationTrap = Surv_Ability.ImmolationTrapRank2; end
-
-if IsSpellKnown(Surv_Ability.FreezingTrapRank3) then _FreezingTrap = Surv_Ability.FreezingTrapRank3;
-elseif IsSpellKnown(Surv_Ability.FreezingTrapRank2) then _FreezingTrap = Surv_Ability.FreezingTrapRank2; end
-
-if IsSpellKnown(Surv_Ability.MongooseBiteRank4) then _MongooseBite = Surv_Ability.MongooseBiteRank4;
-elseif IsSpellKnown(Surv_Ability.MongooseBiteRank3) then _MongooseBite = Surv_Ability.MongooseBiteRank3;
-elseif IsSpellKnown(Surv_Ability.MongooseBiteRank2) then _MongooseBite = Surv_Ability.MongooseBiteRank2; end
-
-if IsSpellKnown(Surv_Ability.RaptorStrikeRank8) then _RaptorStrike = Surv_Ability.RaptorStrikeRank8;
-elseif IsSpellKnown(Surv_Ability.RaptorStrikeRank7) then _RaptorStrike = Surv_Ability.RaptorStrikeRank7;
-elseif IsSpellKnown(Surv_Ability.RaptorStrikeRank6) then _RaptorStrike = Surv_Ability.RaptorStrikeRank6;
-elseif IsSpellKnown(Surv_Ability.RaptorStrikeRank5) then _RaptorStrike = Surv_Ability.RaptorStrikeRank5;
-elseif IsSpellKnown(Surv_Ability.RaptorStrikeRank4) then _RaptorStrike = Surv_Ability.RaptorStrikeRank4;
-elseif IsSpellKnown(Surv_Ability.RaptorStrikeRank3) then _RaptorStrike = Surv_Ability.RaptorStrikeRank3;
-elseif IsSpellKnown(Surv_Ability.RaptorStrikeRank2) then _RaptorStrike = Surv_Ability.RaptorStrikeRank2; end
-
-if IsSpellKnown(Surv_Ability.WingClipRank3) then _WingClip = Surv_Ability.WingClipRank3;
-elseif IsSpellKnown(Surv_Ability.WingClipRank2) then _WingClip = Surv_Ability.WingClipRank2; end
-
-if IsSpellKnown(Surv_Ability.WyvernStingRank3) then _WyvernSting = Surv_Ability.WyvernStingRank3;
-elseif IsSpellKnown(Surv_Ability.WyvernStingRank2) then _WyvernSting = Surv_Ability.WyvernStingRank2; end
-
-ids.optionMaxIds = {
---Beast Mastery
-AspectoftheBeast = _AspectoftheBeast,
-AspectoftheCheetah = _AspectoftheCheetah,
-AspectoftheHawk = _AspectoftheHawk,
-AspectoftheMonkey = _AspectoftheMonkey,
-AspectofthePack = _AspectofthePack,
-AspectoftheWild = _AspectoftheWild,
-BestialWrath = _BestialWrath,
-Intimidation = _Intimidation,
-ScareBeast = _ScareBeast,
---Marksmanship
-AimedShot = _AimedShot,
-ArcaneShot = _ArcaneShot,
-ConcussiveShot = _ConcussiveShot,
-HuntersMark = _HuntersMark,
-MultiShot = _MultiShot,
-RapidFire = _RapidFire,
-ScatterShot = _ScatterShot,
-ScorpidSting = _ScorpidSting,
-SerpentSting = _SerpentSting,
-TrueshotAura = _TrueshotAura,
-ViperSting = _ViperSting,
-Volley = _Volley, 
---Survival
-Counterattack = _Counterattack,
-ExplosiveTrap = _ExplosiveTrap, 
-FreezingTrap = _FreezingTrap,
-FrostTrap = _FrostTrap,
-ImmolationTrap = _ImmolationTrap,
-MongooseBite = _MongooseBite,
-RaptorStrike = _RaptorStrike,
-WingClip = _WingClip,
-WyvernSting = _WyvernSting,
---Runes
-HeartoftheLion = _HeartoftheLion,
-Carve = _Carve,
-ChimeraShot = _ChimeraShot,
-ExplosiveShot = _ExplosiveShot,
-FlankingStrike = _FlankingStrike,
-KillCommand = _KillCommand,
-}
-end
-ConROC:UpdateSpellID()
-function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
-ConROC:UpdateSpellID()
---Character
-	local plvl 												= UnitLevel('player');
-	
---Racials
-		
 --Resources
-	local mana												= UnitPower('player', Enum.PowerType.Mana);
-	local manaMax 											= UnitPowerMax('player', Enum.PowerType.Mana);
-	local manaPercent 										= math.max(0, mana) / math.max(1, manaMax) * 100;
+local _Mana, _Mana_Max, _Mana_Percent = ConROC:PlayerPower('Rage');
+
+--Conditions
+local _Queue = 0;
+local _is_moving = ConROC:PlayerSpeed();
+local _enemies_in_melee, _target_in_melee = ConROC:Targets("Melee");
+local _enemies_in_10yrds, _target_in_10yrds = ConROC:Targets("10");
+local _enemies_in_20yrds, _target_in_20yrds = ConROC:Targets("20");
+local _enemies_in_40yrds, _target_in_40yrds = ConROC:Targets("40");
+local _can_Execute = _Target_Percent_Health < 20;
+
+--Racials
+local _Berserking, _Berserking_RDY = _, _;
+local _Shadowmeld, _Shadowmeld_RDY = _, _;
+
+function ConROC:Stats()
+	_Player_Level = UnitLevel("player");
+	_Player_Percent_Health = ConROC:PercentHealth('player');
+	_Pet_Percent_Health = ConROC:PercentHealth('pet');
+	_is_PvP = ConROC:IsPvP();
+	_in_combat = UnitAffectingCombat('player');
+	_party_size = GetNumGroupMembers();
+	_is_PC = UnitPlayerControlled("target");
+	_is_Enemy = ConROC:TarHostile();
+	_Target_Health = UnitHealth('target');
+	_Target_Percent_Health = ConROC:PercentHealth('target');
+
+	_Mana, _Mana_Max, _Mana_Percent = ConROC:PlayerPower('Rage');
+
+	_Queue = 0;
+	_is_moving = ConROC:PlayerSpeed();
+	_enemies_in_melee, _target_in_melee = ConROC:Targets("Melee");
+	_enemies_in_10yrds, _target_in_10yrds = ConROC:Targets("10");
+	_enemies_in_20yrds, _target_in_20yrds = ConROC:Targets("20");
+	_enemies_in_40yrds, _target_in_40yrds = ConROC:Targets("40");
+	_can_Execute = _Target_Percent_Health < 20;
+
+	_Berserking, _Berserking_RDY = ConROC:AbilityReady(Racial.Berserking, timeShift);
+	_Shadowmeld, _Shadowmeld_RDY = ConROC:AbilityReady(Racial.Shadowmeld, timeShift);
+end
+
+function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
+	ConROC:UpdateSpellID();
+	ConROC:Stats();
 
 --Abilities
-	local bWrathRDY											= ConROC:AbilityReady(_BestialWrath, timeShift);	
-	local intimRDY											= ConROC:AbilityReady(_Intimidation, timeShift);		
-	
-	local aimShotRDY	 									= ConROC:AbilityReady(_AimedShot, timeShift);
-	local arcShotRDY	 									= ConROC:AbilityReady(_ArcaneShot, timeShift);	
-	local autoShot	 										= ConROC:AbilityReady(_AutoShot, timeShift);
-	local concusShotRDY										= ConROC:AbilityReady(_ConcussiveShot, timeShift);
-	local hMarkRDY		 									= ConROC:AbilityReady(_HuntersMark, timeShift);	
-		local hmDEBUFF											= ConROC:DebuffName(_HuntersMark);	
-	local multiRDY	 										= ConROC:AbilityReady(_MultiShot, timeShift);
-	local rFireRDY											= ConROC:AbilityReady(_RapidFire, timeShift);	
-		local rfBUFF											= ConROC:Buff(_RapidFire);	
-	local scatterRDY										= ConROC:AbilityReady(_ScatterShot, timeShift);			
-	local scStingRDY										= ConROC:AbilityReady(_ScorpidSting, timeShift);
-	local sStingRDY											= ConROC:AbilityReady(_SerpentSting, timeShift);
-	local tsAuraRDY											= ConROC:AbilityReady(_TrueshotAura, timeShift);
-		local tsABUFF											= ConROC:Buff(_TrueshotAura);		
-	local vStingRDY											= ConROC:AbilityReady(_ViperSting, timeShift);
-	local volleyRDY											= ConROC:AbilityReady(_Volley, timeShift);		
-		
-	local cAttackRDY										= ConROC:AbilityReady(_Counterattack, timeShift);			
-	local exTrapRDY											= ConROC:AbilityReady(_ExplosiveTrap, timeShift);
-	local imTrapRDY											= ConROC:AbilityReady(_ImmolationTrap, timeShift);
-	local fTrapRDY											= ConROC:AbilityReady(_FreezingTrap, timeShift);
-	local frTrapRDY											= ConROC:AbilityReady(_FrostTrap, timeShift);
-	local mBiteRDY											= ConROC:AbilityReady(_MongooseBite, timeShift);		
-	local rStrikeRDY										= ConROC:AbilityReady(_RaptorStrike, timeShift);
-	local wClipRDY											= ConROC:AbilityReady(_WingClip, timeShift);	
-		local wClipDEBUFF										= ConROC:TargetDebuff(_WingClip, timeShift);		
-	local wStingRDY											= ConROC:AbilityReady(_WyvernSting, timeShift);
-		local wStingDEBUFF										= ConROC:TargetDebuff(_WyvernSting);	
-		
-	local aotHawk											= ConROC:AbilityReady(_AspectoftheHawk, timeShift);
-		local aothForm											= ConROC:Form(_AspectoftheHawk);
-	local aotCheetah										= ConROC:AbilityReady(_AspectoftheCheetah, timeShift);
-		local aotcForm											= ConROC:Form(_AspectoftheCheetah);
-	local aotPack											= ConROC:AbilityReady(_AspectofthePack, timeShift);
-		local aotpForm											= ConROC:Form(_AspectofthePack);
+	local _BestialWrath, _BestialWrath_RDY = ConROC:AbilityReady(Ability.BestialWrath, timeShift);
+	local _Intimidation, _Intimidation_RDY = ConROC:AbilityReady(Ability.Intimidation, timeShift);
+
+	local _AimedShot, _AimedShot_RDY = ConROC:AbilityReady(Ability.AimedShot, timeShift);
+	local _ArcaneShot, _ArcaneShot_RDY = ConROC:AbilityReady(Ability.ArcaneShot, timeShift);
+	local _AutoShot, _AutoShot_RDY = ConROC:AbilityReady(Ability.AutoShot, timeShift);
+	local _ConcussiveShot, _ConcussiveShot_RDY = ConROC:AbilityReady(Ability.ConcussiveShot, timeShift);
+	local _HuntersMark, _HuntersMark_RDY = ConROC:AbilityReady(Ability.HuntersMark, timeShift);
+		local _, _, _, _HuntersMark_DEBUFF = ConROC:TargetAura(_HuntersMark);
+	local _MultiShot, _MultiShot_RDY = ConROC:AbilityReady(Ability.MultiShot, timeShift);
+	local _RapidFire, _RapidFire_RDY = ConROC:AbilityReady(Ability.RapidFire, timeShift);
+		local _RapidFire_BUFF = ConROC:Aura(_RapidFire);
+	local _ScatterShot, _ScatterShot_RDY = ConROC:AbilityReady(Ability.ScatterShot, timeShift);
+	local _ScorpidSting, _ScorpidSting_RDY = ConROC:AbilityReady(Ability.ScorpidSting, timeShift);
+	local _SerpentSting, _SerpentSting_RDY = ConROC:AbilityReady(Ability.SerpentSting, timeShift);
+	local _TrueshotAura, _TrueshotAura_RDY = ConROC:AbilityReady(Ability.TrueshotAura, timeShift);
+		local _TrueshotAura_BUFF = ConROC:Aura(_TrueshotAura);
+	local _ViperSting, _ViperSting_RDY = ConROC:AbilityReady(Ability.ViperSting, timeShift);
+	local _Volley, _Volley_RDY = ConROC:AbilityReady(Ability.Volley, timeShift);
+
+	local _Counterattack, _Counterattack_RDY = ConROC:AbilityReady(Ability.Counterattack, timeShift);
+	local _ExplosiveTrap, _ExplosiveTrap_RDY = ConROC:AbilityReady(Ability.ExplosiveTrap, timeShift);
+	local _ImmolationTrap, _ImmolationTrap_RDY = ConROC:AbilityReady(Ability.ImmolationTrap, timeShift);
+	local _FreezingTrap, _FreezingTrap_RDY = ConROC:AbilityReady(Ability.FreezingTrap, timeShift);
+	local _FrostTrap, _FrostTrap_RDY = ConROC:AbilityReady(Ability.FrostTrap, timeShift);
+	local _MongooseBite, _MongooseBite_RDY = ConROC:AbilityReady(Ability.MongooseBite, timeShift);
+	local _RaptorStrike, _RaptorStrike_RDY	= ConROC:AbilityReady(Ability.RaptorStrike, timeShift);
+	local _WingClip, _WingClip_RDY = ConROC:AbilityReady(Ability.WingClip, timeShift);
+		local _WingClip_DEBUFF = ConROC:TargetAura(_WingClip, timeShift);
+	local _WyvernSting, _WyvernSting_RDY = ConROC:AbilityReady(Ability.WyvernSting, timeShift);
+		local _WyvernSting_DEBUFF = ConROC:TargetAura(_WyvernSting);
+
+	local _AspectoftheHawk, _AspectoftheHawk_RDY = ConROC:AbilityReady(Ability.AspectoftheHawk, timeShift);
+		local _AspectoftheHawk_FORM = ConROC:Form(_AspectoftheHawk);
+	local _AspectoftheCheetah, _AspectoftheCheetah_RDY = ConROC:AbilityReady(Ability.AspectoftheCheetah, timeShift);
+		local _AspectoftheCheetah_FORM = ConROC:Form(_AspectoftheCheetah);
+	local _AspectofthePack, _AspectofthePack_RDY = ConROC:AbilityReady(Ability.AspectofthePack, timeShift);
+		local _AspectofthePack_FORM = ConROC:Form(_AspectofthePack);
 
 --Runes
-	local hotLionRDY 										= ConROC:AbilityReady(_HeartoftheLion, timeShift);
-		local hotLionBUFF 										= ConROC:Buff(_HeartoftheLion, timeShift);
-	local carveRDY 											= ConROC:AbilityReady(_Carve, timeShift);
-	local cShotRDY 											= ConROC:AbilityReady(_ChimeraShot, timeShift);
-	local expShotRDY 										= ConROC:AbilityReady(_ExplosiveShot, timeShift);
-		local expShotDEBUFF 									= ConROC:TargetDebuff(_ExplosiveShot, timeShift);
-	local fStrikeRDY 										= ConROC:AbilityReady(_FlankingStrike, timeShift);
-		local fStrikeBUFF, _, fStrikeCOUNT						= ConROC:Buff(_FlankingStrike, timeShift);
-	local kCommandRDY 										= ConROC:AbilityReady(_KillCommand, timeShift);
-		
---Conditions	
-	local targetPh 											= ConROC:PercentHealth('target');
-	local summoned 											= ConROC:CallPet();
-	local assist 											= ConROC:PetAssist();
-	local inMelee 											= ConROC:IsMeleeRange()--CheckInteractDistance('target', 3);
-	local moving 											= ConROC:PlayerSpeed();	
-	local incombat 											= UnitAffectingCombat('player');
-	local inShotRange										= ConROC:IsSpellInRange(_AutoShot, 'target');
-	--local cPetRDY											= GetCallPetSpellInfo();
-	local tarHasMana 										= UnitPower('target', Enum.PowerType.Mana);
-	local isEnemy                                           = ConROC:TarHostile();
+	local _HeartoftheLion, _HeartoftheLion_RDY = ConROC:AbilityReady(Runes.HeartoftheLion, timeShift);
+		local _HeartoftheLion_BUFF = ConROC:Aura(Buff.HeartoftheLion, timeShift);
+	local _Carve, _Carve_RDY = ConROC:AbilityReady(Runes.Carve, timeShift);
+	local _ChimeraShot, _ChimeraShot_RDY = ConROC:AbilityReady(Runes.ChimeraShot, timeShift);
+	local _ExplosiveShot, _ExplosiveShot_RDY = ConROC:AbilityReady(Runes.ExplosiveShot, timeShift);
+		local _ExplosiveShot_DEBUFF = ConROC:TargetAura(_ExplosiveShot, timeShift);
+	local _FlankingStrike, _FlankingStrike_RDY = ConROC:AbilityReady(Runes.FlankingStrike, timeShift);
+		local _FlankingStrike_BUFF, _FlankingStrike_COUNT = ConROC:Aura(_FlankingStrike, timeShift);
+	local _KillCommand, _KillCommand_RDY = ConROC:AbilityReady(Runes.KillCommand, timeShift);
+
+--Conditions
+	local _Pet_summoned = ConROC:CallPet();
+	local _Pet_assist = ConROC:PetAssist();
+	local _target_in_melee = ConROC:IsMeleeRange();
+	local inShotRange = ConROC:IsSpellInRange(_AutoShot, 'target');
+	--local cPetRDY = GetCallPetSpellInfo();
+	local tarHasMana = UnitPower('target', Enum.PowerType.Mana);
 
 	if IsSpellKnown(_WingClip) then
-		inMelee												= ConROC:IsSpellInRange(_WingClip, 'target');
+		_target_in_melee = ConROC:IsSpellInRange(_WingClip, 'target');
 	end
 
     local stingDEBUFF = {
-		scStingDEBUFF										= ConROC:TargetDebuff(_ScorpidSting);
-        sStingDEBUFF										= ConROC:TargetDebuff(_SerpentSting);
-		vStingDEBUFF										= ConROC:TargetDebuff(_ViperSting);	
-    }	
+		scStingDEBUFF = ConROC:TargetAura(_ScorpidSting);
+        sStingDEBUFF = ConROC:TargetAura(_SerpentSting);
+		vStingDEBUFF = ConROC:TargetAura(_ViperSting);
+    }
 
 	local stingUp = false;
 		for k, v in pairs(stingDEBUFF) do
@@ -352,25 +201,24 @@ ConROC:UpdateSpellID()
 				break
 			end
 		end
-		
---Indicators
-	ConROC:AbilityRaidBuffs(_AspectoftheHawk, aotHawk and not aothForm and not inMelee);	
-	ConROC:AbilityBurst(BM_Ability.BestialWrath, not ConROC:CheckBox(ConROC_SM_Ability_BestialWrath) and bWrathRDY and incombat and summoned);
-	ConROC:AbilityBurst(MM_Ability.RapidFire, not ConROC:CheckBox(ConROC_SM_Ability_RapidFire) and rFireRDY and incombat);
-	ConROC:AbilityMovement(BM_Ability.AspectoftheCheetah, aotCheetah and not aotcForm and not incombat);
 
-	ConROC:AbilityRaidBuffs(_TrueshotAura, tsAuraRDY and not tsABUFF);
-	
+--Indicators
+	ConROC:AbilityRaidBuffs(_AspectoftheHawk, _AspectoftheHawk_RDY and not _AspectoftheHawk_FORM and not _target_in_melee);
+	ConROC:AbilityBurst(_BestialWrath, not ConROC:CheckBox(ConROC_SM_Ability_BestialWrath) and _BestialWrath_RDY and _in_combat and _Pet_summoned);
+	ConROC:AbilityBurst(_RapidFire, not ConROC:CheckBox(ConROC_SM_Ability_RapidFire) and _RapidFire_RDY and _in_combat);
+	ConROC:AbilityMovement(_AspectoftheCheetah, _AspectoftheCheetah_RDY and not _AspectoftheCheetah_FORM and not _in_combat);
+
+	ConROC:AbilityRaidBuffs(_TrueshotAura, _TrueshotAura_RDY and not _TrueshotAura_BUFF);
+
 --Warnings
---[[	if cPetRDY and not summoned and incombat then
+--[[	if cPetRDY and not _Pet_summoned and _in_combat then
 		ConROC:Warnings("Call your pet!!!", true);
 	end]]
 
 --Rotations
-	--[[
 	if ConROC.Seasons.IsSoD then --DPS rotation for SoD
 		if currentSpecID == ids.Spec.BeastMastery then
-			if isEnemy and ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and hMarkRDY and not hmDEBUFF and not inMelee then
+			if _is_Enemy and ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_DEBUFF and not _target_in_melee then
 				return _HuntersMark;
 			end
 		end
@@ -379,268 +227,222 @@ ConROC:UpdateSpellID()
 		if currentSpecID == ids.Spec.Survival then
 		end
 	end
-	--]]
 	if ConROC.Seasons.IsSoD then
-			--print("AutoShotActive", AutoShotActive);
-		if hotLionRDY and not hotLionBUFF then
+		if _HeartoftheLion_RDY and not _HeartoftheLion_BUFF then
 			return _HeartoftheLion
 		end
-		if kCommandRDY and summoned then
+		if _KillCommand_RDY and _Pet_summoned then
 			return _KillCommand
 		end
-		if not assist and summoned and incombat then
+		if not _Pet_assist and _Pet_summoned and _in_combat then
 			ConROC:Warnings("Pet is NOT attacking!!!", true);		
 		end
 		if inShotRange then
 			if ConROC:CheckBox(ConROC_SM_Role_Melee) then
-				if autoShot and not AutoShotActive then
+				if _AutoShot_RDY and not _AutoShot_ACTIVE then
 					return _AutoShot;
 				end
-				if ConROC_AoEButton:IsVisible() and multiRDY then
+				if ConROC_AoEButton:IsVisible() and _MultiShot_RDY then
 					return _MultiShot
 				end
-				if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and sStingRDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+				if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and _SerpentSting_RDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 					return _SerpentSting;
 				end
 			end
-			if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and hMarkRDY and not hmDEBUFF and not inMelee then
+			if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_DEBUFF and not _target_in_melee then
 				return _HuntersMark;
 			end	
-			if ConROC:CheckBox(ConROC_SM_Sting_Viper) and vStingRDY and not stingUp and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+			if ConROC:CheckBox(ConROC_SM_Sting_Viper) and _ViperSting_RDY and not stingUp and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 				return _ViperSting;
 			end
-			
-			if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and sStingRDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+
+			if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and _SerpentSting_RDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 				return _SerpentSting;
 			end
-			
-			if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and scStingRDY and not stingUp and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+
+			if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and _ScorpidSting_RDY and not stingUp and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 				return _ScorpidSting;
 			end
-			if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and aimShotRDY and currentSpell ~= _AimedShot then
+			if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and _AimedShot_RDY and currentSpell ~= _AimedShot then
 				return _AimedShot;
 			end
-			if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and multiRDY then
+			if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and _MultiShot_RDY then
 				return _MultiShot;
-			end		
-			if arcShotRDY and currentSpell ~= _AimedShot and ((manaPercent >= 50) or moving or ((targetPh <= 5 and ConROC:Raidmob()) or (targetPh <= 20 and not ConROC:Raidmob()))) then
+			end
+			if _ArcaneShot_RDY and currentSpell ~= _AimedShot and ((_Mana_Percent >= 50) or _is_moving or ((_Target_Percent_Health <= 5 and ConROC:Raidmob()) or (_Target_Percent_Health <= 20 and not ConROC:Raidmob()))) then
 				return _ArcaneShot;
 			end
-			if autoShot and not AutoShotActive then
+			if _AutoShot_RDY and not _AutoShot_ACTIVE then
 				return _AutoShot;
 			end
 		end
-		if inMelee then
-			AutoShotActive = false;
-			if fStrikeRDY then
+		if _target_in_melee then
+			_AutoShot_ACTIVE = false;
+			if _FlankingStrike_RDY then
 				return _FlankingStrike;
 			end
-			if rStrikeRDY then
+			if _RaptorStrike_RDY then
 				return _RaptorStrike
 			end
-			if cAttackRDY then
+			if _Counterattack_RDY then
 				return _Counterattack;
 			end
-		
-			if mBiteRDY then
+
+			if _MongooseBite_RDY then
 				return _MongooseBite;
 			end
-			if carveRDY then
+			if _Carve_RDY then
 				return _Carve;
 			end
-			
-			if ConROC:CheckBox(ConROC_SM_Stun_WingClip) and wClipRDY and not wClipDEBUFF then
+
+			if ConROC:CheckBox(ConROC_SM_Stun_WingClip) and _WingClip_RDY and not _WingClip_DEBUFF then
 				return _WingClip;
 			end
-			
-			if rStrikeRDY then
+
+			if _RaptorStrike_RDY then
 				return _RaptorStrike;
 			end
 		end
 		return nil
 	end
 	--not SoD
-	if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and hMarkRDY and not hmDEBUFF and not inMelee then
+	if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_DEBUFF and not _target_in_melee then
 		return _HuntersMark;
-	end	
-
-	if ConROC:CheckBox(ConROC_SM_Stun_Intimidation) and intimRDY and summoned and ConROC:TarYou() then
-		return BM_Ability.Intimidation;
 	end
 
-	if ConROC:CheckBox(ConROC_SM_Stun_ScatterShot) and scatterRDY and ConROC:IsSpellInRange(MM_Ability.ScatterShot, 'target') and ConROC:TarYou() then
-		return MM_Ability.ScatterShot;
+	if ConROC:CheckBox(ConROC_SM_Stun_Intimidation) and _Intimidation_RDY and _Pet_summoned and ConROC:TarYou() then
+		return _Intimidation;
 	end
-		
+
+	if ConROC:CheckBox(ConROC_SM_Stun_ScatterShot) and _ScatterShot_RDY and ConROC:IsSpellInRange(_ScatterShot, 'target') and ConROC:TarYou() then
+		return _ScatterShot;
+	end
+
 	if inShotRange then
-		if ConROC:CheckBox(ConROC_SM_Stun_ConcussiveShot) and concusShotRDY and ConROC:TarYou() then
-			return MM_Ability.ConcussiveShot;
+		if ConROC:CheckBox(ConROC_SM_Stun_ConcussiveShot) and _ConcussiveShot_RDY and ConROC:TarYou() then
+			return _ConcussiveShot;
 		end
-		
-		if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and aimShotRDY and currentSpell ~= _AimedShot then
+
+		if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and _AimedShot_RDY and currentSpell ~= _AimedShot then
 			return _AimedShot;
 		end
 
-		if ConROC:CheckBox(ConROC_SM_Sting_Viper) and vStingRDY and not stingUp and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+		if ConROC:CheckBox(ConROC_SM_Sting_Viper) and _ViperSting_RDY and not stingUp and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 			return _ViperSting;
 		end
-		
-		if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and sStingRDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+
+		if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and _SerpentSting_RDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 			return _SerpentSting;
 		end
-		
-		if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and scStingRDY and not stingUp and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+
+		if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and _ScorpidSting_RDY and not stingUp and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 			return _ScorpidSting;
 		end
-		
-		if ConROC:CheckBox(ConROC_SM_Ability_BestialWrath) and bWrathRDY and incombat and summoned then
-			return BM_Ability.BestialWrath;
+
+		if ConROC:CheckBox(ConROC_SM_Ability_BestialWrath) and _BestialWrath_RDY and _in_combat and _Pet_summoned then
+			return _BestialWrath;
 		end
-		
-		if ConROC:CheckBox(ConROC_SM_Ability_RapidFire) and rFireRDY and incombat then
-			return MM_Ability.RapidFire;
+
+		if ConROC:CheckBox(ConROC_SM_Ability_RapidFire) and _RapidFire_RDY and _in_combat then
+			return _RapidFire;
 		end
-		
-		if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and multiRDY then
+
+		if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and _MultiShot_RDY then
 			return _MultiShot;
 		end
-		
-		if ConROC_AoEButton:IsVisible() and volleyRDY then
+
+		if ConROC_AoEButton:IsVisible() and _Volley_RDY then
 			return _Volley;
 		end
-		
-		if arcShotRDY and currentSpell ~= _AimedShot and ((manaPercent >= 50) or moving or ((targetPh <= 5 and ConROC:Raidmob()) or (targetPh <= 20 and not ConROC:Raidmob()))) then
+
+		if _ArcaneShot_RDY and currentSpell ~= _AimedShot and ((_Mana_Percent >= 50) or _is_moving or ((_Target_Percent_Health <= 5 and ConROC:Raidmob()) or (_Target_Percent_Health <= 20 and not ConROC:Raidmob()))) then
 			return _ArcaneShot;
 		end
-		
-		if autoShot then
+
+		if _AutoShot_RDY then
 			return _AutoShot;
 		end
 	end
 
-	if inMelee then
-		if cAttackRDY then
+	if _target_in_melee then
+		if _Counterattack_RDY then
 			return _Counterattack;
 		end
-	
-		if mBiteRDY then
+
+		if _MongooseBite_RDY then
 			return _MongooseBite;
 		end
-		
-		if ConROC:CheckBox(ConROC_SM_Stun_WingClip) and wClipRDY and not wClipDEBUFF then
+
+		if ConROC:CheckBox(ConROC_SM_Stun_WingClip) and _WingClip_RDY and not _WingClip_DEBUFF then
 			return _WingClip;
 		end
-		
-		if rStrikeRDY then
+
+		if _RaptorStrike_RDY then
 			return _RaptorStrike;
 		end
 	end
-	
-	return nil;
+
+return nil;
 end
 
 function ConROC.Hunter.Defense(_, timeShift, currentSpell, gcd)
---Character
-	local plvl 												= UnitLevel('player');
-	
---Racials
-		
---Resources
-	local focus 											= UnitPower('player', Enum.PowerType.Focus);
-	local focusMax 											= UnitPowerMax('player', Enum.PowerType.Focus);
+	ConROC:UpdateSpellID();
+	ConROC:Stats();
 
---Ranks
-	--Beast Mastery
-	local _AspectoftheWild = BM_Ability.AspectoftheWildRank1;
-	local _MendPet = BM_Ability.MendPetRank1;
-
-	if IsSpellKnown(BM_Ability.AspectoftheWildRank2) then _AspectoftheWild = BM_Ability.AspectoftheWildRank2; end
-
-	if IsSpellKnown(BM_Ability.MendPetRank7) then _MendPet = BM_Ability.MendPetRank7;
-	elseif IsSpellKnown(BM_Ability.MendPetRank6) then _MendPet = BM_Ability.MendPetRank6;
-	elseif IsSpellKnown(BM_Ability.MendPetRank5) then _MendPet = BM_Ability.MendPetRank5;
-	elseif IsSpellKnown(BM_Ability.MendPetRank4) then _MendPet = BM_Ability.MendPetRank4;
-	elseif IsSpellKnown(BM_Ability.MendPetRank3) then _MendPet = BM_Ability.MendPetRank3;
-	elseif IsSpellKnown(BM_Ability.MendPetRank2) then _MendPet = BM_Ability.MendPetRank2; end
-	
-	--Marksmanship
-	local _DistractingShot = MM_Ability.DistractingShotRank1;
-
-	if IsSpellKnown(MM_Ability.DistractingShotRank6) then _DistractingShot = MM_Ability.DistractingShotRank6;
-	elseif IsSpellKnown(MM_Ability.DistractingShotRank5) then _DistractingShot = MM_Ability.DistractingShotRank5;
-	elseif IsSpellKnown(MM_Ability.DistractingShotRank4) then _DistractingShot = MM_Ability.DistractingShotRank4;
-	elseif IsSpellKnown(MM_Ability.DistractingShotRank3) then _DistractingShot = MM_Ability.DistractingShotRank3;
-	elseif IsSpellKnown(MM_Ability.DistractingShotRank2) then _DistractingShot = MM_Ability.DistractingShotRank2; end
-
-	--Survival
-	local _Disengage = Surv_Ability.DisengageRank1;
-
-	if IsSpellKnown(Surv_Ability.DisengageRank3) then _Disengage = Surv_Ability.DisengageRank3;
-	elseif IsSpellKnown(Surv_Ability.DisengageRank2) then _Disengage = Surv_Ability.DisengageRank2; end	
-	
 --Abilities
-	local feedRDY											= ConROC:AbilityReady(BM_Ability.FeedPet, timeShift);
-		local happiness 									= GetPetHappiness();
-	local mendPetRDY 										= ConROC:AbilityReady(_MendPet, timeShift);
-	
-	local disShotRDY										= ConROC:AbilityReady(_DistractingShot, timeShift);	
+	local _FeedPet, _FeedPet_RDY = ConROC:AbilityReady(Ability.FeedPet, timeShift);
+	local _MendPet, _MendPet_RDY = ConROC:AbilityReady(Ability.MendPet, timeShift);
 
-	local deterRDY											= ConROC:AbilityReady(Surv_Ability.Deterrence, timeShift);
-	local disenRDY											= ConROC:AbilityReady(_Disengage, timeShift);
-	local fDeathRDY											= ConROC:AbilityReady(Surv_Ability.FeignDeath, timeShift);
+	local _DistractingShot, _DistractingShot_RDY = ConROC:AbilityReady(Ability.DistractingShot, timeShift);
 
-	local aotMonkeyRDY											= ConROC:AbilityReady(BM_Ability.AspectoftheMonkey, timeShift);
-		local aotmForm											= ConROC:Form(BM_Ability.AspectoftheMonkey);
-	local aotWild											= ConROC:AbilityReady(_AspectoftheWild, timeShift);
-		local aotwForm											= ConROC:Form(_AspectoftheWild);
-		
+	local _Deterrence, _Deterrence_RDY = ConROC:AbilityReady(Ability.Deterrence, timeShift);
+	local _Disengage, _Disengage_RDY = ConROC:AbilityReady(Ability.Disengage, timeShift);
+	local _FeignDeath, _FeignDeath_RDY = ConROC:AbilityReady(Ability.FeignDeath, timeShift);
+
+	local _AspectoftheMonkey, _AspectoftheMonkey_RDY = ConROC:AbilityReady(Ability.AspectoftheMonkey, timeShift);
+		local _AspectoftheMonkey_FORM = ConROC:Form(_AspectoftheMonkey);
+	local _AspectoftheWild, _AspectoftheWild_RDY = ConROC:AbilityReady(Ability.AspectoftheWild, timeShift);
+		local _AspectoftheWild_FORM = ConROC:Form(_AspectoftheWild);
+
 --Conditions	
-	local playerPh 											= ConROC:PercentHealth('player');
-	local summoned 											= ConROC:CallPet();	
-	local petPh												= ConROC:PercentHealth('pet');
-	local incombat 											= UnitAffectingCombat('player');
-	local inMelee 											= ConROC:IsMeleeRange()--CheckInteractDistance('target', 3);
-	
-	if IsSpellKnown(_WingClip) then
-		inMelee											= ConROC:IsSpellInRange(_WingClip, 'target');
+	local _Pet_summoned = ConROC:CallPet();
+	local _, _target_in_melee = ConROC:IsMeleeRange();
+	local _Pet_Happiness = GetPetHappiness();
+
+	if _Pet_Happiness == nil then
+		_Pet_Happiness = 0;
 	end
-	
-	if happiness == nil then
-		happiness = 0;
-	end
-	
+
 --Indicators
-	ConROC:AbilityRaidBuffs(BM_Ability.FeedPet, feedRDY and summoned and not incombat and happiness < 3);
-	
+	ConROC:AbilityRaidBuffs(_FeedPet, _FeedPet_RDY and _Pet_summoned and not _in_combat and _Pet_Happiness < 3);
+
 --Rotations	
-	if disenRDY and inMelee and ConROC:TarYou() then
+	if _Disengage_RDY and _target_in_melee and ConROC:TarYou() then
 		return _Disengage;
 	end
-	
-	if aotMonkeyRDY and not aotmForm and inMelee and ConROC:TarYou() then
-		return BM_Ability.AspectoftheMonkey;
+
+	if _AspectoftheMonkey_RDY and not _AspectoftheMonkey_FORM and _target_in_melee and ConROC:TarYou() then
+		return _AspectoftheMonkey;
 	end
-	
-	if deterRDY and playerPh <= 30 and ConROC:TarYou() then
-		return Surv_Ability.Deterrence;
+
+	if _Deterrence_RDY and _Player_Percent_Health <= 30 and ConROC:TarYou() then
+		return _Deterrence;
 	end
-	
-	if fDeathRDY and playerPh <= 30 and ConROC:TarYou() then
-		return Surv_Ability.FeignDeath;
-	end	
-	
-	if mendPetRDY and summoned and petPh <= 40 then
+
+	if _FeignDeath_RDY and _Player_Percent_Health <= 30 and ConROC:TarYou() then
+		return _FeignDeath;
+	end
+
+	if _MendPet_RDY and _Pet_summoned and _Pet_Percent_Health <= 40 then
 		return _MendPet;
 	end
-	
-	return nil;
+return nil;
 end
 
 function ConROC:JustCasted(spellID)
-    if spellID == (_AutoShot or _SerpentSting) then
-        AutoShotActive = true;
-    end
-    if spellID ~= (_AutoShot or _SerpentSting) then
-        AutoShotActive = false;
+    if spellID == (ids.Ability.AutoShot or ids.Ability.SerpentSting) then
+        _AutoShot_ACTIVE = true;
+	else
+        _AutoShot_ACTIVE = false;
     end
 end

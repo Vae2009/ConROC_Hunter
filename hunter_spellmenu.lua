@@ -105,6 +105,7 @@ end
 
 
 function ConROC:SpellmenuClass()
+	ConROC:UpdateSpellID();
 	ConROC_RoleSettingsTable = {
 		{
 		frameName = "Ranged",
@@ -140,7 +141,7 @@ function ConROC:SpellmenuClass()
 	    frameName = "Abilities",
 	    spells = {
 	    	{spellID = ids.Ability.HuntersMark, spellCheckbox = "Ability_HuntersMark", reqLevel = 6, type="spell"},
-	    	{spellID = ids.Ability.ChimeraShot, spellCheckbox = "Ability_ChimeraShot", reqLevel = 1, type="spell"},
+	    	{spellID = ids.Runes.ChimeraShot, spellCheckbox = "Ability_ChimeraShot", reqLevel = 1, type="spell"},
 	    	{spellID = ids.Ability.MultiShot, spellCheckbox = "Ability_MultiShot", reqLevel = 18, type="spell"},
 	    	{spellID = ids.Ability.AimedShot, spellCheckbox = "Ability_AimedShot", reqLevel = 20, type="spell"},
 	    	{spellID = ids.Ability.RapidFire, spellCheckbox = "Ability_RapidFire", reqLevel = 26, type="spell"},

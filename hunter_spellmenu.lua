@@ -162,7 +162,8 @@ function ConROC:SpellmenuClass()
 	  {
 	    frameName = "Options",
 	    spells = {
-		    {spellID = "AoE Toggle Button", spellCheckbox = "Option_AoE", reqLevel = 18, type="aoetoggler"},
+		    {spellID = ids.Ability.AutoShot, spellCheckbox = "Option_AutoShot", reqLevel = 1, type = "custom", icon = ids.Ability.AutoShot, customName = "Auto Shot reminder"},
+		    {spellID = "AoE Toggle Button", spellCheckbox = "Option_AoE", reqLevel = 18, type = "aoetoggler"},
 	    }
 	  }
 	}
@@ -579,7 +580,7 @@ end
 function ConROC:CustomOption(_spellData, i, j, _spellFrame)
 	local spellName, _, spellTexture = GetSpellInfo(_spellData.spellID)
 	local oItem = CreateFrame("CheckButton", "ConROC_SM_".._spellData.spellCheckbox, _spellFrame, "UICheckButtonTemplate");
-	local oItemtext = oItem:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall");		
+	local oItemtext = oItem:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall");
 	if j == 1 then
 		oItem:SetPoint("TOPLEFT", lastFrame, "TOPLEFT", 0, 0);
 	else
@@ -605,11 +606,12 @@ function ConROC:CustomOption(_spellData, i, j, _spellFrame)
 	c1t:SetSize(20,20)
 	c1t:SetPoint("LEFT", oItem, "RIGHT", 2, 0);
 	oItemtext:SetPoint('LEFT', c1t, 'RIGHT', 4, 0);
-	
+
 	scrollHeight = scrollHeight + math.ceil(lastFrame:GetHeight());
 	spellFrameHeight = spellFrameHeight + math.ceil(lastFrame:GetHeight());
 	lastFrame:Show();
 end
+
 function ConROC:OptionAoE(_spellData, i, j, _spellFrame)
 	local myFrame = "ConROC_SM_".._spellData.spellCheckbox
 	local oItem = CreateFrame("CheckButton", myFrame, _spellFrame, "UICheckButtonTemplate");

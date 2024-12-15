@@ -80,7 +80,7 @@ local _Target_Health = UnitHealth('target');
 local _Target_Percent_Health = ConROC:PercentHealth('target');
 
 --Resources
-local _Mana, _Mana_Max, _Mana_Percent = ConROC:PlayerPower('Rage');
+local _Mana, _Mana_Max, _Mana_Percent = ConROC:PlayerPower('Mana');
 
 --Conditions
 local _Queue = 0;
@@ -107,7 +107,7 @@ function ConROC:Stats()
 	_Target_Health = UnitHealth('target');
 	_Target_Percent_Health = ConROC:PercentHealth('target');
 
-	_Mana, _Mana_Max, _Mana_Percent = ConROC:PlayerPower('Rage');
+	_Mana, _Mana_Max, _Mana_Percent = ConROC:PlayerPower('Mana');
 
 	_Queue = 0;
 	_is_moving = ConROC:PlayerSpeed();
@@ -179,14 +179,9 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 --Conditions
 	local _Pet_summoned = ConROC:CallPet();
 	local _Pet_assist = ConROC:PetAssist();
-	local _target_in_melee = ConROC:IsMeleeRange();
-	local inShotRange = ConROC:IsSpellInRange(_AutoShot, 'target');
+	local _in_shot_range = ConROC:IsSpellInRange(_AutoShot, 'target');
 	--local cPetRDY = GetCallPetSpellInfo();
 	local tarHasMana = UnitPower('target', Enum.PowerType.Mana);
-
-	if IsSpellKnown(_WingClip) then
-		_target_in_melee = ConROC:IsSpellInRange(_WingClip, 'target');
-	end
 
     local stingDEBUFF = {
 		scStingDEBUFF = ConROC:TargetAura(_ScorpidSting);
@@ -222,36 +217,46 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 				return _HuntersMark;
 			end
 		end
+
 		if currentSpecID == ids.Spec.Marksmanship then
 		end
+
 		if currentSpecID == ids.Spec.Survival then
 		end
 	end
+
 	if ConROC.Seasons.IsSoD then
 		if _HeartoftheLion_RDY and not _HeartoftheLion_BUFF then
 			return _HeartoftheLion
 		end
+
 		if _KillCommand_RDY and _Pet_summoned then
 			return _KillCommand
 		end
+
 		if not _Pet_assist and _Pet_summoned and _in_combat then
 			ConROC:Warnings("Pet is NOT attacking!!!", true);		
 		end
-		if inShotRange then
+
+		if _in_shot_range then
 			if ConROC:CheckBox(ConROC_SM_Role_Melee) then
-				if _AutoShot_RDY and not _AutoShot_ACTIVE then
+				if ConROC:CheckBox(ConROC_SM_Option_AutoShot) and _AutoShot_RDY and not _AutoShot_ACTIVE then
 					return _AutoShot;
 				end
+
 				if ConROC_AoEButton:IsVisible() and _MultiShot_RDY then
 					return _MultiShot
 				end
+
 				if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and _SerpentSting_RDY and not stingUp and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 					return _SerpentSting;
 				end
 			end
+
 			if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_UP and not _target_in_melee then
 				return _HuntersMark;
-			end	
+			end
+
 			if ConROC:CheckBox(ConROC_SM_Sting_Viper) and _ViperSting_RDY and not stingUp and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 				return _ViperSting;
 			end
@@ -263,27 +268,34 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 			if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and _ScorpidSting_RDY and not stingUp and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
 				return _ScorpidSting;
 			end
+
 			if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and _AimedShot_RDY and currentSpell ~= _AimedShot then
 				return _AimedShot;
 			end
+
 			if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and _MultiShot_RDY then
 				return _MultiShot;
 			end
+
 			if _ArcaneShot_RDY and currentSpell ~= _AimedShot and ((_Mana_Percent >= 50) or _is_moving or ((_Target_Percent_Health <= 5 and ConROC:Raidmob()) or (_Target_Percent_Health <= 20 and not ConROC:Raidmob()))) then
 				return _ArcaneShot;
 			end
-			if _AutoShot_RDY and not _AutoShot_ACTIVE then
+
+			if ConROC:CheckBox(ConROC_SM_Option_AutoShot) and _AutoShot_RDY and not _AutoShot_ACTIVE then
 				return _AutoShot;
 			end
 		end
+
 		if _target_in_melee then
 			_AutoShot_ACTIVE = false;
 			if _FlankingStrike_RDY then
 				return _FlankingStrike;
 			end
+
 			if _RaptorStrike_RDY then
 				return _RaptorStrike
 			end
+
 			if _Counterattack_RDY then
 				return _Counterattack;
 			end
@@ -291,6 +303,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 			if _MongooseBite_RDY then
 				return _MongooseBite;
 			end
+
 			if _Carve_RDY then
 				return _Carve;
 			end
@@ -303,7 +316,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 				return _RaptorStrike;
 			end
 		end
-		return nil
+	return nil
 	end
 	--not SoD
 	if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_UP and not _target_in_melee then
@@ -318,7 +331,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 		return _ScatterShot;
 	end
 
-	if inShotRange then
+	if _in_shot_range then
 		if ConROC:CheckBox(ConROC_SM_Stun_ConcussiveShot) and _ConcussiveShot_RDY and ConROC:TarYou() then
 			return _ConcussiveShot;
 		end
@@ -355,16 +368,17 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 			return _Volley;
 		end
 
-		if _ArcaneShot_RDY and currentSpell ~= _AimedShot and ((_Mana_Percent >= 50) or _is_moving or ((_Target_Percent_Health <= 5 and ConROC:Raidmob()) or (_Target_Percent_Health <= 20 and not ConROC:Raidmob()))) then
+		if _ArcaneShot_RDY and currentSpell ~= _AimedShot and ((_Mana_Percent >= 50) or _is_moving or (_Target_Percent_Health <= 5 and ConROC:Raidmob()) or (_Target_Percent_Health <= 20 and not ConROC:Raidmob())) then
 			return _ArcaneShot;
 		end
 
-		if _AutoShot_RDY then
+		if ConROC:CheckBox(ConROC_SM_Option_AutoShot) and _AutoShot_RDY and not _AutoShot_ACTIVE then
 			return _AutoShot;
 		end
 	end
 
 	if _target_in_melee then
+		_AutoShot_ACTIVE = false;
 		if _Counterattack_RDY then
 			return _Counterattack;
 		end
@@ -381,7 +395,6 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 			return _RaptorStrike;
 		end
 	end
-
 return nil;
 end
 

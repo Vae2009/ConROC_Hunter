@@ -167,7 +167,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 
 --Runes
 	local _HeartoftheLion, _HeartoftheLion_RDY = ConROC:AbilityReady(Runes.HeartoftheLion, timeShift);
-		local _HeartoftheLion_BUFF = ConROC:Aura(Buff.HeartoftheLion, timeShift);
+		local _HeartoftheLion_BUFF = ConROC:Form(_HeartoftheLion);
 	local _Carve, _Carve_RDY = ConROC:AbilityReady(Runes.Carve, timeShift);
 	local _ChimeraShot, _ChimeraShot_RDY = ConROC:AbilityReady(Runes.ChimeraShot, timeShift);
 	local _ExplosiveShot, _ExplosiveShot_RDY = ConROC:AbilityReady(Runes.ExplosiveShot, timeShift);
@@ -235,7 +235,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 		end
 
 		if not _Pet_assist and _Pet_summoned and _in_combat then
-			ConROC:Warnings("Pet is NOT attacking!!!", true);		
+			ConROC:Warnings("Pet is NOT attacking!!!", true);
 		end
 
 		if _in_shot_range then

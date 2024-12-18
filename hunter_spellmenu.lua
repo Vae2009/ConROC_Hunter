@@ -21,17 +21,19 @@ local plvl = UnitLevel('player');
 
 local defaults = {
 	["ConROC_SM_Role_Ranged"] = true,
+	["ConROC_SM_Role_PvP"] = false,
 
 	["ConROC_Ranged_Sting_Serpent"] = true,
 	["ConROC_Ranged_Ability_HuntersMark"] = true,
 	["ConROC_Ranged_Ability_RapidFire"] = true,
 	["ConROC_Ranged_Ability_BestialWrath"] = true,
-	["ConROC_SM_Role_PvP"] = false,
+	["ConROC_Ranged_Option_AutoShot"] = true,
 
 	["ConROC_PvP_Sting_Serpent"] = true,
 	["ConROC_PvP_Ability_HuntersMark"] = true,
 	["ConROC_PvP_Ability_RapidFire"] = true,
 	["ConROC_PvP_Ability_BestialWrath"] = true,
+	["ConROC_PvP_Option_AutoShot"] = true,
 }
 
 
@@ -475,24 +477,22 @@ function ConROC:OptionRadioButtonSpell(_spellData, i, j, _spellFrame, _radioButt
 	end
 	lastFrame = oItem;
 	oItem:SetSize(20,20)
-	
+
 	ConROC:setRoleChecked(_spellData, oItem)
 	oItem.spellCheckbox = _spellData.spellCheckbox
 	_radioButtonsTable[j] = oItem;
-	
-	oItem:SetScript("OnClick", 
+
+	oItem:SetScript("OnClick",
 		function(self)
 			local role, checkboxName, frameName = ConROC:checkActiveRole()
 			for _, radioButton in ipairs(_radioButtonsTable) do
 				if radioButton ~= self then
 					radioButton:SetChecked(false)
 					ConROCHunterSpells[checkboxName .. radioButton.spellCheckbox] = radioButton:GetChecked()
-					
 				else
 					-- Perform any additional logic based on the selected button
 					self:SetChecked(true)
 					ConROCHunterSpells[checkboxName .. radioButton.spellCheckbox] = self:GetChecked()
-					
 				end
 			end
 		end);

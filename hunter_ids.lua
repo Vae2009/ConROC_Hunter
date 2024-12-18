@@ -225,6 +225,9 @@ ids.Survival_Talent = {
 	Survivalist = 15,
 	MonsterSlaying = 16,
 }
+ids.Engrave = {
+	MeleeSpecialist = 6998,
+}
 ids.Runes = {
 	HeartoftheLion = 409580, --buff
 	LoneWolf = 415370,  --passive
@@ -235,9 +238,19 @@ ids.Runes = {
 	ExplosiveShot = 409552, --debuffs
 	FlankingStrike = 415320, --buffs stack up to 3 times
 	KillCommand = 409379,
+	KillShot = 409593,
+	RaptorStrikeRank1 = 415335, -- MeleeSpecialist
+	RaptorStrikeRank2 = 415336,
+	RaptorStrikeRank3 = 415337,
+	RaptorStrikeRank4 = 415338,
+	RaptorStrikeRank5 = 415340,
+	RaptorStrikeRank6 = 415341,
+	RaptorStrikeRank7 = 415342,
+	RaptorStrikeRank8 = 415343,
+
 	SerpentSpread = 425738, --passive
 	SniperTraining = 415399, --passive
-	MeleeSpecialist = 415352, --Phase 2 - passive
+
 	TrapLauncher = 409541, --Phase 2 - Passive
 }
 --Pet
@@ -247,6 +260,7 @@ ids.Pet = {
 -- Auras
 ids.Buff = {
 	HeartoftheLion = 409583,
+	RaptorFury = 415362,
 }
 ids.Debuff = {
 
@@ -327,13 +341,28 @@ function ConROC:UpdateSpellID()
 	elseif IsSpellKnown(ids.Rank.MongooseBiteRank3) then ids.Ability.MongooseBite = ids.Rank.MongooseBiteRank3;
 	elseif IsSpellKnown(ids.Rank.MongooseBiteRank2) then ids.Ability.MongooseBite = ids.Rank.MongooseBiteRank2; end
 
-	if IsSpellKnown(ids.Rank.RaptorStrikeRank8) then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank8;
-	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank7) then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank7;
-	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank6) then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank6;
-	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank5) then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank5;
-	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank4) then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank4;
-	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank3) then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank3;
-	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank2) then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank2; end
+	if IsSpellKnown(ids.Rank.RaptorStrikeRank8) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank8;
+		else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank8; end
+	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank7) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank7;
+		else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank7; end
+	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank6) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank6;
+	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank6; end
+	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank5) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank5;
+	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank5; end
+	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank4) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank4;
+	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank4; end
+	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank3) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank3;
+	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank3; end
+	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank2) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank2;
+	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank2; end
+	end
 
 	if IsSpellKnown(ids.Rank.WingClipRank3) then ids.Ability.WingClip = ids.Rank.WingClipRank3;
 	elseif IsSpellKnown(ids.Rank.WingClipRank2) then ids.Ability.WingClip = ids.Rank.WingClipRank2; end
@@ -358,4 +387,4 @@ function ConROC:UpdateSpellID()
 
 	if IsSpellKnown(ids.Rank.DisengageRank3) then ids.Ability.Disengage = ids.Rank.DisengageRank3;
 	elseif IsSpellKnown(ids.Rank.DisengageRank2) then ids.Ability.Disengage = ids.Rank.DisengageRank2; end
-end	
+end

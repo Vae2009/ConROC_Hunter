@@ -175,6 +175,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 	local _FlankingStrike, _FlankingStrike_RDY = ConROC:AbilityReady(Runes.FlankingStrike, timeShift);
 		local _FlankingStrike_BUFF, _FlankingStrike_COUNT = ConROC:Aura(_FlankingStrike, timeShift);
 	local _KillCommand, _KillCommand_RDY = ConROC:AbilityReady(Runes.KillCommand, timeShift);
+	local _KillShot, _KillShot_RDY = ConROC:AbilityReady(Runes.KillShot, timeShift);
 
 --Conditions
 	local _Pet_summoned = ConROC:CallPet();
@@ -211,20 +212,6 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 	end]]
 
 --Rotations
-	if ConROC.Seasons.IsSoD then --DPS rotation for SoD
-		if currentSpecID == ids.Spec.BeastMastery then
-			if _is_Enemy and ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_UP and not _target_in_melee then
-				return _HuntersMark;
-			end
-		end
-
-		if currentSpecID == ids.Spec.Marksmanship then
-		end
-
-		if currentSpecID == ids.Spec.Survival then
-		end
-	end
-
 	if ConROC.Seasons.IsSoD then
 		if _HeartoftheLion_RDY and not _HeartoftheLion_BUFF then
 			return _HeartoftheLion
@@ -236,6 +223,10 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 
 		if not _Pet_assist and _Pet_summoned and _in_combat then
 			ConROC:Warnings("Pet is NOT attacking!!!", true);
+		end
+
+		if _KillShot_RDY and _Target_Percent_Health < 20 then
+			return _KillShot
 		end
 
 		if _in_shot_range then

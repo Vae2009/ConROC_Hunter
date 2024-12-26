@@ -1,8 +1,16 @@
 ConROC.Hunter = {};
 
 local ConROC_Hunter, ids = ...;
-local currentSpecName;
-local currentSpecID;
+
+function ConROC:EnableRotationModule()
+	self.Description = 'Hunter';
+	self.NextSpell = ConROC.Hunter.Damage;
+
+	self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED');
+	self.lastSpellId = 0;
+
+	ConROC:SpellmenuClass();
+end
 
 function ConROC:EnableDefenseModule()
 	self.NextDef = ConROC.Hunter.Defense;
@@ -16,58 +24,11 @@ function ConROC:UNIT_SPELLCAST_SUCCEEDED(event, unitID, lineID, spellID)
 	ConROC:JustCasted(spellID);
 end
 
-function ConROC:PopulateTalentIDs()
-    local numTabs = GetNumTalentTabs()
-
-    for tabIndex = 1, numTabs do
-        local tabName = GetTalentTabInfo(tabIndex)
-        tabName = string.gsub(tabName, "[^%w]", "") .. "_Talent" -- Remove spaces from tab name
-        print("ids."..tabName.." = {")
-        local numTalents = GetNumTalents(tabIndex)
-
-        for talentIndex = 1, numTalents do
-            local name, _, _, _, _ = GetTalentInfo(tabIndex, talentIndex)
-
-            if name then
-                local talentID = string.gsub(name, "[^%w]", "") -- Remove spaces from talent name
-                    print(talentID .." = ", talentIndex ..",")
-            end
-        end
-        print("}")
-    end
-end
-
-local Racial, Spec, Ability, Rank, BM_Talent, MM_Talent, Surv_Talent, Pet, Runes, Buff, Debuff = ids.Racial, ids.Spec, ids.Ability, ids.Rank, ids.BeastMastery_Talent, ids.Marksmanship_Talent, ids.Survival_Talent, ids.Pet, ids.Runes, ids.Buff, ids.Debuff;
+local Racial, Spec, Ability, Rank, BM_Talent, MM_Talent, Surv_Talent, Pet, Engrave, Runes, Buff, Debuff = ids.Racial, ids.Spec, ids.Ability, ids.Rank, ids.BeastMastery_Talent, ids.Marksmanship_Talent, ids.Survival_Talent, ids.Pet, ids.Engrave, ids.Runes, ids.Buff, ids.Debuff;
 local _AutoShot_ACTIVE = false;
 
-function ConROC:SpecUpdate()
-	currentSpecName = ConROC:currentSpec()
-    currentSpecID = ConROC:currentSpec("ID")
-
-	if currentSpecName then
-	   ConROC:Print(self.Colors.Info .. "Current spec:", self.Colors.Success ..  currentSpecName)
-	else
-	   ConROC:Print(self.Colors.Error .. "You do not currently have a spec.")
-	end
-end
-
-ConROC:SpecUpdate()
-
-function ConROC:EnableRotationModule()
-	self.Description = 'Hunter';
-	self.NextSpell = ConROC.Hunter.Damage;
-
-	self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED');
-	self:RegisterEvent("PLAYER_TALENT_UPDATE");
-	self.lastSpellId = 0;
-end
-
-function ConROC:PLAYER_TALENT_UPDATE()
-	ConROC:SpecUpdate();
-    ConROC:closeSpellmenu();
-end
-
 --Info
+local _Player_Spec, _Player_Spec_ID = ConROC:currentSpec();
 local _Player_Level = UnitLevel("player");
 local _Player_Percent_Health = ConROC:PercentHealth('player');
 local _Pet_Percent_Health = ConROC:PercentHealth('pet');
@@ -96,6 +57,7 @@ local _Berserking, _Berserking_RDY = _, _;
 local _Shadowmeld, _Shadowmeld_RDY = _, _;
 
 function ConROC:Stats()
+	_Player_Spec, _Player_Spec_ID = ConROC:currentSpec();
 	_Player_Level = UnitLevel("player");
 	_Player_Percent_Health = ConROC:PercentHealth('player');
 	_Pet_Percent_Health = ConROC:PercentHealth('pet');

@@ -21,19 +21,42 @@ local plvl = UnitLevel('player');
 
 local defaults = {
 	["ConROC_SM_Role_Ranged"] = true,
+	["ConROC_SM_Role_Melee"] = false,
 	["ConROC_SM_Role_PvP"] = false,
 
 	["ConROC_Ranged_Sting_Serpent"] = true,
+	["ConROC_Ranged_Sting_Scorpid"] = false,
+	["ConROC_Ranged_Sting_Viper"] = false,
+	["ConROC_Ranged_Sting_None"] = false,
 	["ConROC_Ranged_Ability_HuntersMark"] = true,
+	["ConROC_Ranged_Ability_ChimeraShot"] = true,
+	["ConROC_Ranged_Ability_MultiShot"] = true,
+	["ConROC_Ranged_Ability_AimedShot"] = true,
 	["ConROC_Ranged_Ability_RapidFire"] = true,
 	["ConROC_Ranged_Ability_BestialWrath"] = true,
+	["ConROC_Ranged_Stun_ConcussiveShot"] = false,
+	["ConROC_Ranged_Stun_WingClip"] = false,
+	["ConROC_Ranged_Stun_Intimidation"] = false,
+	["ConROC_Ranged_Stun_ScatterShot"] = false,
 	["ConROC_Ranged_Option_AutoShot"] = true,
+	["ConROC_Ranged_Option_AoE"] = false,
 
-	["ConROC_PvP_Sting_Serpent"] = true,
-	["ConROC_PvP_Ability_HuntersMark"] = true,
-	["ConROC_PvP_Ability_RapidFire"] = true,
-	["ConROC_PvP_Ability_BestialWrath"] = true,
-	["ConROC_PvP_Option_AutoShot"] = true,
+	["ConROC_Melee_Sting_Serpent"] = true,
+	["ConROC_Melee_Sting_Scorpid"] = false,
+	["ConROC_Melee_Sting_Viper"] = false,
+	["ConROC_Melee_Sting_None"] = false,
+	["ConROC_Melee_Ability_HuntersMark"] = true,
+	["ConROC_Melee_Ability_ChimeraShot"] = true,
+	["ConROC_Melee_Ability_MultiShot"] = true,
+	["ConROC_Melee_Ability_AimedShot"] = true,
+	["ConROC_Melee_Ability_RapidFire"] = true,
+	["ConROC_Melee_Ability_BestialWrath"] = true,
+	["ConROC_Melee_Stun_ConcussiveShot"] = false,
+	["ConROC_Melee_Stun_WingClip"] = false,
+	["ConROC_Melee_Stun_Intimidation"] = false,
+	["ConROC_Melee_Stun_ScatterShot"] = false,
+	["ConROC_Melee_Option_AutoShot"] = true,
+	["ConROC_Melee_Option_AoE"] = false,
 }
 
 
@@ -48,6 +71,7 @@ function ConROC:setRole(radioBtn, roleData, radioButtons)
     radioBtn:SetChecked(true)
     ConROCHunterSpells[roleData.role] = true
 end
+
 function ConROC:checkActiveRole()
 	for _, roleSettings in ipairs(ConROC_RoleSettingsTable) do
         local frameName = roleSettings.frameName
@@ -129,7 +153,7 @@ function ConROC:SpellmenuClass()
 		},
 	}
 	ConROC_RotationSettingsTable = {
-	 {
+		{
 	    frameName = "Stings",
 	    spells = {
 	      {spellID = ids.Ability.SerpentSting, spellCheckbox = "Sting_Serpent", reqLevel = 4, type="spell"},
@@ -138,8 +162,8 @@ function ConROC:SpellmenuClass()
 	      {spellID = "None", spellCheckbox = "Sting_None", reqLevel = 4, type="none"}
 	    },
 	    groupType = "radioButtons"
-	  },
-	  {
+	 	},
+	  	{
 	    frameName = "Abilities",
 	    spells = {
 	    	{spellID = ids.Ability.HuntersMark, spellCheckbox = "Ability_HuntersMark", reqLevel = 6, type="spell"},
@@ -150,8 +174,8 @@ function ConROC:SpellmenuClass()
 	    	{spellID = ids.Ability.BestialWrath, spellCheckbox = "Ability_BestialWrath", reqLevel = 40, type="spell"}
 	    },
 	    groupType = "checkBoxes"
-	  },
-	  {
+	  	},
+	  	{
 	    frameName = "Stuns and Slows",
 	    spells = {
 	    	{spellID = ids.Ability.ConcussiveShot, spellCheckbox = "Stun_ConcussiveShot", reqLevel = 8, type="spell"},
@@ -160,8 +184,8 @@ function ConROC:SpellmenuClass()
 	    	{spellID = ids.Ability.ScatterShot, spellCheckbox = "Stun_ScatterShot", reqLevel = 20, type="spell"},
 	    },
 	    groupType = "checkBoxes"
-	  },
-	  {
+	  	},
+	  	{
 	    frameName = "Options",
 	    spells = {
 		    {spellID = ids.Ability.AutoShot, spellCheckbox = "Option_AutoShot", reqLevel = 1, type = "custom", icon = ids.Ability.AutoShot, customName = "Auto Shot reminder"},
@@ -259,7 +283,7 @@ function ConROC:SpellmenuClass()
 
 	-- Register for events to check scrollbar visibility
 	ConROCScrollChild:SetScript("OnSizeChanged", CheckScrollbarVisibility)
-	ConROCScrollContainer:SetScript("OnShow", CheckScrollbarVisibility)		
+	ConROCScrollContainer:SetScript("OnShow", CheckScrollbarVisibility)
 end
 
 local function ConROC_NoOptionsFrame()
@@ -714,8 +738,7 @@ end
 
 function ConROC:SpellMenuUpdate(newSpell)
 	ConROC:UpdateSpellID();
-	--print("ConROC.SpellsChanged",ConROC.SpellsChanged)
-	--if newSpell then ConROC:UpdateSpellID() end
+
     lastFrame = ConROCScrollChild;
     local anyHLVisible = false;
     scrollHeight = 0;
@@ -976,5 +999,3 @@ function ConROC:RoleProfile()
 	    end
 	end
 end
-
-ConROC:SpellmenuClass();

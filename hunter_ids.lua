@@ -229,6 +229,7 @@ ids.Engrave = {
 	MeleeSpecialist = 6998,
 }
 ids.Runes = {
+	AspectoftheViper = 415423,
 	HeartoftheLion = 409580, --buff
 	LoneWolf = 415370,  --passive
 	MasterMarksman = 409428, --passive
@@ -371,6 +372,8 @@ function ConROC:UpdateSpellID()
 	elseif IsSpellKnown(ids.Rank.WyvernStingRank2) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank2; end
 
 	if IsSpellKnown(ids.Rank.AspectoftheWildRank2) then ids.Ability.AspectoftheWild = ids.Rank.AspectoftheWildRank2; end
+
+	if ConROC.Seasons.IsSoD then ids.Ability.AspectoftheViper = ids.Runes.AspectoftheViper; end
 
 	if IsSpellKnown(ids.Rank.MendPetRank7) then ids.Ability.MendPet = ids.Rank.MendPetRank7;
 	elseif IsSpellKnown(ids.Rank.MendPetRank6) then ids.Ability.MendPet = ids.Rank.MendPetRank6;

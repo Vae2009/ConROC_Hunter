@@ -129,9 +129,9 @@ local function CheckScrollbarVisibility()
     end
 end
 
+function ConROC:RotationChoices()
+    ConROC:UpdateSpellID();
 
-function ConROC:SpellmenuClass()
-	ConROC:UpdateSpellID();
 	ConROC_RoleSettingsTable = {
 		{
 		frameName = "Ranged",
@@ -163,11 +163,22 @@ function ConROC:SpellmenuClass()
 	    },
 	    groupType = "radioButtons"
 	 	},
+		{
+		frameName = "Aspect",
+		spells = {
+			{spellID = ids.Ability.AspectoftheHawk, spellCheckbox = "Aspect_AspectoftheHawk", reqLevel = 10, type="spell"},
+			{spellID = ids.Ability.AspectoftheMonkey, spellCheckbox = "Aspect_AspectoftheMonkey", reqLevel = 4, type="spell"},
+			{spellID = ids.Ability.AspectoftheViper, spellCheckbox = "Aspect_AspectoftheViper", reqLevel = 1, type="spell"},
+			{spellID = ids.Ability.AspectoftheWild, spellCheckbox = "Aspect_AspectoftheWild", reqLevel = 46, type="spell"},
+		},
+		groupType = "radioButtons"
+		},
 	  	{
 	    frameName = "Abilities",
 	    spells = {
 	    	{spellID = ids.Ability.HuntersMark, spellCheckbox = "Ability_HuntersMark", reqLevel = 6, type="spell"},
 	    	{spellID = ids.Runes.ChimeraShot, spellCheckbox = "Ability_ChimeraShot", reqLevel = 1, type="spell"},
+			{spellID = ids.Runes.HeartoftheLion, spellCheckbox = "Ability_HeartoftheLion", reqLevel = 1, type="spell"},
 	    	{spellID = ids.Ability.MultiShot, spellCheckbox = "Ability_MultiShot", reqLevel = 18, type="spell"},
 	    	{spellID = ids.Ability.AimedShot, spellCheckbox = "Ability_AimedShot", reqLevel = 20, type="spell"},
 	    	{spellID = ids.Ability.RapidFire, spellCheckbox = "Ability_RapidFire", reqLevel = 26, type="spell"},
@@ -193,6 +204,11 @@ function ConROC:SpellmenuClass()
 	    }
 	  }
 	}
+end
+
+function ConROC:SpellmenuClass()
+	ConROC:RotationChoices();
+
 
 	local _, Class, classId = UnitClass("player")
 	local Color = RAID_CLASS_COLORS[Class]
@@ -737,7 +753,7 @@ function ConROC:OptionNone(_spellData, i, j, _spellFrame, _checkType, _radioButt
 end
 
 function ConROC:SpellMenuUpdate(newSpell)
-	ConROC:UpdateSpellID();
+	ConROC:RotationChoices();
 
     lastFrame = ConROCScrollChild;
     local anyHLVisible = false;
@@ -792,9 +808,6 @@ function ConROC:SpellMenuUpdate(newSpell)
                             oItem:Hide()
                             --print("Hide spell", spellName)
                         end
-                    else
-                        --scrollHeight = scrollHeight + math.ceil(lFrame:GetHeight());
-                        --spellFrameHeight = spellFrameHeight + math.ceil(oItem:GetHeight());
                     end
                 --spell end
                 elseif _spellData.type == "poison" then
@@ -962,9 +975,6 @@ function ConROC:SpellMenuUpdate(newSpell)
         ConROCScrollContainer:Show();
         ConROCScrollChild:Show();
     end
-	if newSpell then
-		ConROC:closeSpellmenu();
-	end
 end
 
 function ConROC:RoleProfile()

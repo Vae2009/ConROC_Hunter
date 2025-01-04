@@ -34,6 +34,7 @@ local defaults = {
 	["ConROC_Ranged_Ability_AimedShot"] = true,
 	["ConROC_Ranged_Ability_RapidFire"] = true,
 	["ConROC_Ranged_Ability_BestialWrath"] = true,
+	["ConROC_Ranged_Fire_None"] = true,
 	["ConROC_Ranged_Stun_ConcussiveShot"] = false,
 	["ConROC_Ranged_Stun_WingClip"] = false,
 	["ConROC_Ranged_Stun_Intimidation"] = false,
@@ -51,6 +52,7 @@ local defaults = {
 	["ConROC_Melee_Ability_AimedShot"] = true,
 	["ConROC_Melee_Ability_RapidFire"] = true,
 	["ConROC_Melee_Ability_BestialWrath"] = true,
+	["ConROC_Melee_Fire_None"] = true,
 	["ConROC_Melee_Stun_ConcussiveShot"] = false,
 	["ConROC_Melee_Stun_WingClip"] = false,
 	["ConROC_Melee_Stun_Intimidation"] = false,
@@ -156,50 +158,67 @@ function ConROC:RotationChoices()
 		{
 	    frameName = "Stings",
 	    spells = {
-	      {spellID = ids.Ability.SerpentSting, spellCheckbox = "Sting_Serpent", reqLevel = 4, type="spell"},
-	      {spellID = ids.Ability.ScorpidSting, spellCheckbox = "Sting_Scorpid", reqLevel = 22, type="spell"},
-	      {spellID = ids.Ability.ViperSting, spellCheckbox = "Sting_Viper", reqLevel = 36, type="spell"},
+	      {spellID = ids.Ability.SerpentSting, spellCheckbox = "Sting_Serpent", reqLevel = 4, type = "spell"},
+	      {spellID = ids.Ability.ScorpidSting, spellCheckbox = "Sting_Scorpid", reqLevel = 22, type ="spell"},
+	      {spellID = ids.Ability.ViperSting, spellCheckbox = "Sting_Viper", reqLevel = 36, type = "spell"},
 	      {spellID = "None", spellCheckbox = "Sting_None", reqLevel = 4, type="none"}
 	    },
 	    groupType = "radioButtons"
 	 	},
 		{
-		frameName = "Aspect",
+		frameName = "Aspects",
 		spells = {
-			{spellID = ids.Ability.AspectoftheHawk, spellCheckbox = "Aspect_AspectoftheHawk", reqLevel = 10, type="spell"},
-			{spellID = ids.Ability.AspectoftheMonkey, spellCheckbox = "Aspect_AspectoftheMonkey", reqLevel = 4, type="spell"},
-			{spellID = ids.Ability.AspectoftheViper, spellCheckbox = "Aspect_AspectoftheViper", reqLevel = 1, type="spell"},
-			{spellID = ids.Ability.AspectoftheWild, spellCheckbox = "Aspect_AspectoftheWild", reqLevel = 46, type="spell"},
+			{spellID = ids.Runes.AspectoftheFalcon, spellCheckbox = "Aspect_AspectoftheFalcon", reqLevel = 60, type = "spell"},
+			{spellID = ids.Ability.AspectoftheHawk, spellCheckbox = "Aspect_AspectoftheHawk", reqLevel = 10, type = "spell"},
+			{spellID = ids.Ability.AspectoftheMonkey, spellCheckbox = "Aspect_AspectoftheMonkey", reqLevel = 4, type ="spell"},
+			{spellID = ids.Ability.AspectoftheViper, spellCheckbox = "Aspect_AspectoftheViper", reqLevel = 1, type = "spell"},
+			{spellID = ids.Ability.AspectoftheWild, spellCheckbox = "Aspect_AspectoftheWild", reqLevel = 46, type = "spell"},
 		},
 		groupType = "radioButtons"
 		},
 	  	{
 	    frameName = "Abilities",
 	    spells = {
-	    	{spellID = ids.Ability.HuntersMark, spellCheckbox = "Ability_HuntersMark", reqLevel = 6, type="spell"},
-	    	{spellID = ids.Runes.ChimeraShot, spellCheckbox = "Ability_ChimeraShot", reqLevel = 1, type="spell"},
-			{spellID = ids.Runes.HeartoftheLion, spellCheckbox = "Ability_HeartoftheLion", reqLevel = 1, type="spell"},
-	    	{spellID = ids.Ability.MultiShot, spellCheckbox = "Ability_MultiShot", reqLevel = 18, type="spell"},
-	    	{spellID = ids.Ability.AimedShot, spellCheckbox = "Ability_AimedShot", reqLevel = 20, type="spell"},
-	    	{spellID = ids.Ability.RapidFire, spellCheckbox = "Ability_RapidFire", reqLevel = 26, type="spell"},
-	    	{spellID = ids.Ability.BestialWrath, spellCheckbox = "Ability_BestialWrath", reqLevel = 40, type="spell"}
+	    	{spellID = ids.Ability.HuntersMark, spellCheckbox = "Ability_HuntersMark", reqLevel = 6, type = "spell"},
+	    	{spellID = ids.Runes.ChimeraShot, spellCheckbox = "Ability_ChimeraShot", reqLevel = 1, type = "spell"},
+			{spellID = ids.Runes.HeartoftheLion, spellCheckbox = "Ability_HeartoftheLion", reqLevel = 1, type = "spell"},
+			{spellID = ids.Runes.KillShot, spellCheckbox = "Ability_KillShot", reqLevel = 1, type = "spell"},
+	    	{spellID = ids.Ability.AimedShot, spellCheckbox = "Ability_AimedShot", reqLevel = 20, type = "spell"},
+	    	{spellID = ids.Ability.RapidFire, spellCheckbox = "Ability_RapidFire", reqLevel = 26, type = "spell"},
+	    	{spellID = ids.Ability.BestialWrath, spellCheckbox = "Ability_BestialWrath", reqLevel = 40, type = "spell"},
+	    	{spellID = ids.Ability.MultiShot, spellCheckbox = "Ability_MultiShot", reqLevel = 18, type = "spell"},
+	    	{spellID = ids.Ability.RaptorStrike, spellCheckbox = "Ability_RaptorStrike", reqLevel = 1, type = "spell"},
+	    	{spellID = ids.Ability.MongooseBite, spellCheckbox = "Ability_MongooseBite", reqLevel = 16, type = "spell"},
+	    	{spellID = ids.Runes.FlankingStrike, spellCheckbox = "Ability_FlankingStrike", reqLevel = 1, type = "spell"},
+	    	{spellID = ids.Runes.Carve, spellCheckbox = "Ability_Carve", reqLevel = 1, type = "spell"},
+	    	{spellID = ids.Ability.Counterattack, spellCheckbox = "Ability_Counterattack", reqLevel = 30, type = "spell"},
+	    	{spellID = ids.Runes.WyvernStrike, spellCheckbox = "Ability_WyvernStrike", reqLevel = 40, type = "spell"},
 	    },
 	    groupType = "checkBoxes"
 	  	},
+		  {
+		  frameName = "Fire Traps",
+		  spells = {
+			  {spellID = ids.Ability.ImmolationTrap, spellCheckbox = "Fire_ImmolationTrap", reqLevel = 16, type = "spell"},
+			  {spellID = ids.Ability.ExplosiveTrap, spellCheckbox = "Fire_ExplosiveTrap", reqLevel = 34, type ="spell"},
+			  {spellID = "None", spellCheckbox = "Fire_None", reqLevel = 4, type="none"}
+		  },
+		  groupType = "radioButtons"
+		  },
 	  	{
 	    frameName = "Stuns and Slows",
 	    spells = {
-	    	{spellID = ids.Ability.ConcussiveShot, spellCheckbox = "Stun_ConcussiveShot", reqLevel = 8, type="spell"},
-	    	{spellID = ids.Ability.WingClip, spellCheckbox = "Stun_WingClip", reqLevel = 12, type="spell"},
-	    	{spellID = ids.Ability.Intimidation, spellCheckbox = "Stun_Intimidation", reqLevel = 30, type="spell"},
-	    	{spellID = ids.Ability.ScatterShot, spellCheckbox = "Stun_ScatterShot", reqLevel = 20, type="spell"},
+	    	{spellID = ids.Ability.ConcussiveShot, spellCheckbox = "Stun_ConcussiveShot", reqLevel = 8, type = "spell"},
+	    	{spellID = ids.Ability.WingClip, spellCheckbox = "Stun_WingClip", reqLevel = 12, type = "spell"},
+	    	{spellID = ids.Ability.Intimidation, spellCheckbox = "Stun_Intimidation", reqLevel = 30, type = "spell"},
+	    	{spellID = ids.Ability.ScatterShot, spellCheckbox = "Stun_ScatterShot", reqLevel = 20, type = "spell"},
 	    },
 	    groupType = "checkBoxes"
 	  	},
 	  	{
 	    frameName = "Options",
 	    spells = {
-		    {spellID = ids.Ability.AutoShot, spellCheckbox = "Option_AutoShot", reqLevel = 1, type = "custom", icon = ids.Ability.AutoShot, customName = "Auto Shot reminder"},
+			{spellID = ids.Ability.WingClip, spellCheckbox = "Option_WingClip", reqLevel = 12, type="custom", icon = 2974, customName="Extra ATK Proc"},
 		    {spellID = "AoE Toggle Button", spellCheckbox = "Option_AoE", reqLevel = 18, type = "aoetoggler"},
 	    }
 	  }
@@ -208,7 +227,6 @@ end
 
 function ConROC:SpellmenuClass()
 	ConROC:RotationChoices();
-
 
 	local _, Class, classId = UnitClass("player")
 	local Color = RAID_CLASS_COLORS[Class]
@@ -441,7 +459,7 @@ function ConROC_OptionsWindow(_table, _roles)
                 if _table[i].groupType == "radioButtons" then
                     ConROC:OptionRadioButtonSpell(_spellData, i, j, _spellFrame, radioButtonsTable);
                 else
-                    ConROC:OptionCheckboxSpell(_spellData, i, j, _spellFrame);                  
+                    ConROC:OptionCheckboxSpell(_spellData, i, j, _spellFrame);
                 end
             elseif _spellData.type == "custom" then
                 ConROC:CustomOption(_spellData, i, j, _spellFrame);
@@ -510,7 +528,7 @@ function ConROC:OptionRadioButtonSpell(_spellData, i, j, _spellFrame, _radioButt
 	end
 	local myFrame = "ConROC_SM_".._spellData.spellCheckbox
 	local oItem = CreateFrame("CheckButton", myFrame, _spellFrame, "UIRadioButtonTemplate");
-	local oItemtext = oItem:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall");		
+	local oItemtext = oItem:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall");
 	if j == 1 then
 		oItem:SetPoint("TOPLEFT", lastFrame, "TOPLEFT", 0, 0);
 	else

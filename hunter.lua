@@ -29,6 +29,9 @@ end
 local Racial, Spec, Ability, Rank, BM_Talent, MM_Talent, Surv_Talent, Pet, Engrave, Runes, Buff, Debuff = ids.Racial, ids.Spec, ids.Ability, ids.Rank, ids.BeastMastery_Talent, ids.Marksmanship_Talent, ids.Survival_Talent, ids.Pet, ids.Engrave, ids.Runes, ids.Buff, ids.Debuff;
 local _AutoShot_ACTIVE = false;
 
+local _AutoAttack, _AutoAttack_RDY = ConROC:AbilityReady(6603, timeShift);
+local _AutoShot, _AutoShot_RDY = ConROC:AbilityReady(75, timeShift);
+
 --Info
 local _Player_Spec, _Player_Spec_ID = ConROC:currentSpec();
 local _Player_Level = UnitLevel("player");
@@ -59,6 +62,9 @@ local _Berserking, _Berserking_RDY = _, _;
 local _Shadowmeld, _Shadowmeld_RDY = _, _;
 
 function ConROC:Stats()
+	_AutoAttack, _AutoAttack_RDY = ConROC:AbilityReady(6603, timeShift);
+	_AutoShot, _AutoShot_RDY = ConROC:AbilityReady(75, timeShift);
+
 	_Player_Spec, _Player_Spec_ID = ConROC:currentSpec();
 	_Player_Level = UnitLevel("player");
 	_Player_Percent_Health = ConROC:PercentHealth('player');
@@ -97,19 +103,21 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 
 	local _AimedShot, _AimedShot_RDY = ConROC:AbilityReady(Ability.AimedShot, timeShift);
 	local _ArcaneShot, _ArcaneShot_RDY = ConROC:AbilityReady(Ability.ArcaneShot, timeShift);
-	local _AutoShot, _AutoShot_RDY = ConROC:AbilityReady(Ability.AutoShot, timeShift);
 	local _ConcussiveShot, _ConcussiveShot_RDY = ConROC:AbilityReady(Ability.ConcussiveShot, timeShift);
 	local _HuntersMark, _HuntersMark_RDY = ConROC:AbilityReady(Ability.HuntersMark, timeShift);
-		local _HuntersMark_BUFF = ConROC:TargetAura(_HuntersMark);
+		local _HuntersMark_BUFF = ConROC:TargetAura(_HuntersMark, timeShift);
 	local _MultiShot, _MultiShot_RDY = ConROC:AbilityReady(Ability.MultiShot, timeShift);
 	local _RapidFire, _RapidFire_RDY = ConROC:AbilityReady(Ability.RapidFire, timeShift);
-		local _RapidFire_BUFF = ConROC:Aura(_RapidFire);
+		local _RapidFire_BUFF = ConROC:Aura(_RapidFire, timeShift);
 	local _ScatterShot, _ScatterShot_RDY = ConROC:AbilityReady(Ability.ScatterShot, timeShift);
 	local _ScorpidSting, _ScorpidSting_RDY = ConROC:AbilityReady(Ability.ScorpidSting, timeShift);
+		local _ScorpidSting_DEBUFF, _, _ScorpidSting_DUR = ConROC:TargetAura(_ScorpidSting, timeShift);
 	local _SerpentSting, _SerpentSting_RDY = ConROC:AbilityReady(Ability.SerpentSting, timeShift);
+		local _SerpentSting_DEBUFF, _, _SerpentSting_DUR = ConROC:TargetAura(_SerpentSting, timeShift);
 	local _TrueshotAura, _TrueshotAura_RDY = ConROC:AbilityReady(Ability.TrueshotAura, timeShift);
-		local _TrueshotAura_BUFF = ConROC:Aura(_TrueshotAura);
+		local _TrueshotAura_BUFF = ConROC:Aura(_TrueshotAura, timeShift);
 	local _ViperSting, _ViperSting_RDY = ConROC:AbilityReady(Ability.ViperSting, timeShift);
+		local _ViperSting_DEBUFF, _, _ViperSting_DUR = ConROC:TargetAura(_ViperSting, timeShift);
 	local _Volley, _Volley_RDY = ConROC:AbilityReady(Ability.Volley, timeShift);
 
 	local _Counterattack, _Counterattack_RDY = ConROC:AbilityReady(Ability.Counterattack, timeShift);
@@ -122,10 +130,12 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 	local _WingClip, _WingClip_RDY = ConROC:AbilityReady(Ability.WingClip, timeShift);
 		local _WingClip_DEBUFF = ConROC:TargetAura(_WingClip, timeShift);
 	local _WyvernSting, _WyvernSting_RDY = ConROC:AbilityReady(Ability.WyvernSting, timeShift);
-		local _WyvernSting_DEBUFF = ConROC:TargetAura(_WyvernSting);
+		local _WyvernSting_DEBUFF = ConROC:TargetAura(_WyvernSting, timeShift);
 
 	local _AspectoftheHawk, _AspectoftheHawk_RDY = ConROC:AbilityReady(Ability.AspectoftheHawk, timeShift);
 		local _AspectoftheHawk_FORM = ConROC:Form(_AspectoftheHawk);
+	local _AspectoftheFalcon, _AspectoftheFalcon_RDY = ConROC:AbilityReady(Runes.AspectoftheFalcon, timeShift);
+		local _AspectoftheFalcon_FORM = ConROC:Form(_AspectoftheFalcon);
 	local _AspectoftheCheetah, _AspectoftheCheetah_RDY = ConROC:AbilityReady(Ability.AspectoftheCheetah, timeShift);
 		local _AspectoftheCheetah_FORM = ConROC:Form(_AspectoftheCheetah);
 	local _AspectoftheMonkey, _AspectoftheMonkey_RDY = ConROC:AbilityReady(Ability.AspectoftheMonkey, timeShift);
@@ -138,25 +148,32 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 		local _AspectoftheWild_FORM = ConROC:Form(_AspectoftheWild);
 
 --Runes
-	local _HeartoftheLion, _HeartoftheLion_RDY = ConROC:AbilityReady(Runes.HeartoftheLion, timeShift);
-		local _HeartoftheLion_FORM = ConROC:Form(_HeartoftheLion);
 	local _Carve, _Carve_RDY = ConROC:AbilityReady(Runes.Carve, timeShift);
 	local _ChimeraShot, _ChimeraShot_RDY = ConROC:AbilityReady(Runes.ChimeraShot, timeShift);
 	local _ExplosiveShot, _ExplosiveShot_RDY = ConROC:AbilityReady(Runes.ExplosiveShot, timeShift);
 		local _ExplosiveShot_DEBUFF = ConROC:TargetAura(_ExplosiveShot, timeShift);
 	local _FlankingStrike, _FlankingStrike_RDY = ConROC:AbilityReady(Runes.FlankingStrike, timeShift);
-		local _FlankingStrike_BUFF, _FlankingStrike_COUNT = ConROC:Aura(_FlankingStrike, timeShift);
+		local _FlankingStrike_BUFF, _FlankingStrike_COUNT, _FlankingStrike_DUR = ConROC:Aura(_FlankingStrike, timeShift);
+	local _HeartoftheLion, _HeartoftheLion_RDY = ConROC:AbilityReady(Runes.HeartoftheLion, timeShift);
+		local _HeartoftheLion_FORM = ConROC:Form(_HeartoftheLion);
 	local _KillCommand, _KillCommand_RDY = ConROC:AbilityReady(Runes.KillCommand, timeShift);
 	local _KillShot, _KillShot_RDY = ConROC:AbilityReady(Runes.KillShot, timeShift);
 	local _, _LoneWolf_PASSIVE = ConROC:AbilityReady(Runes.LoneWolf, timeShift);
+		local _LockandLoad_BUFF = ConROC:Aura(Buff.LockandLoad, timeShift);
+	local _WyvernStrike, _WyvernStrike_RDY = ConROC:AbilityReady(Runes.WyvernStrike, timeShift);
 
 --Conditions
 	local _Pet_summoned = ConROC:CallPet();
 	local _Pet_assist = ConROC:PetAssist();
 	local tarHasMana = UnitPower('target', Enum.PowerType.Mana);
-	local _Sting_UP = ConROC:TargetAura(_ScorpidSting) or ConROC:TargetAura(_SerpentSting) or ConROC:TargetAura(_ViperSting);
+	local _Sting_UP = _ScorpidSting_DEBUFF or _SerpentSting_DEBUFF or _ViperSting_DEBUFF;
+
+	if _target_in_melee then
+		_AutoShot_ACTIVE = false;
+	end
 
 --Indicators
+	ConROC:AbilityRaidBuffs(_AspectoftheFalcon, ConROC:CheckBox(ConROC_SM_Aspect_AspectoftheFalcon) and _AspectoftheFalcon_RDY and not _AspectoftheFalcon_FORM);
 	ConROC:AbilityRaidBuffs(_AspectoftheHawk, ConROC:CheckBox(ConROC_SM_Aspect_AspectoftheHawk) and _AspectoftheHawk_RDY and not _AspectoftheHawk_FORM);
 	ConROC:AbilityRaidBuffs(_AspectoftheMonkey, ConROC:CheckBox(ConROC_SM_Aspect_AspectoftheMonkey) and _AspectoftheMonkey_RDY and not _AspectoftheMonkey_FORM);
 	ConROC:AbilityRaidBuffs(_AspectoftheViper, ConROC:CheckBox(ConROC_SM_Aspect_AspectoftheViper) and _AspectoftheViper_RDY and not _AspectoftheViper_FORM);
@@ -182,53 +199,92 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 					break;
 				end
 
-				if _KillCommand_RDY and _Pet_summoned then
-					tinsert(ConROC.SuggestedSpells, _KillCommand);
-					_KillCommand_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if _KillShot_RDY and _Target_Percent_Health < 20 then
-					tinsert(ConROC.SuggestedSpells, _KillShot);
-					_KillShot_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
 				if _target_in_melee then
 					_AutoShot_ACTIVE = false;
-					if _FlankingStrike_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_FlankingStrike) and _FlankingStrike_RDY and _FlankingStrike_DUR <= 3 then
 						tinsert(ConROC.SuggestedSpells, _FlankingStrike);
 						_FlankingStrike_RDY = false;
+						_FlankingStrike_DUR = 10;
 						_Queue = _Queue + 1;
 						break;
 					end
 
-					if _RaptorStrike_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_RaptorStrike) and _RaptorStrike_RDY then
 						tinsert(ConROC.SuggestedSpells, _RaptorStrike);
 						_RaptorStrike_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
 
-					if _Counterattack_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_WyvernStrike) and _WyvernStrike_RDY then
+						tinsert(ConROC.SuggestedSpells, _WyvernStrike);
+						_WyvernStrike_RDY = false;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Ability_Counterattack) and _Counterattack_RDY then
 						tinsert(ConROC.SuggestedSpells, _Counterattack);
 						_Counterattack_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
 
-					if _MongooseBite_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_MongooseBite) and _MongooseBite_RDY then
 						tinsert(ConROC.SuggestedSpells, _MongooseBite);
 						_MongooseBite_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
 
-					if _Carve_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_KillShot) and _KillShot_RDY then
+						tinsert(ConROC.SuggestedSpells, _KillShot);
+						_KillShot_RDY = false;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Ability_FlankingStrike) and _FlankingStrike_RDY then
+						tinsert(ConROC.SuggestedSpells, _FlankingStrike);
+						_FlankingStrike_RDY = false;
+						_FlankingStrike_DUR = 10;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Ability_Carve) and _Carve_RDY then
 						tinsert(ConROC.SuggestedSpells, _Carve);
 						_Carve_RDY = false;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Fire_ImmolationTrap) and ConROC:RuneEquipped(Engrave.LockandLoad, "head") and _ImmolationTrap_RDY and not _LockandLoad_BUFF then
+						tinsert(ConROC.SuggestedSpells, _ImmolationTrap);
+						_ImmolationTrap_RDY = false;
+						_LockandLoad_BUFF = true;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Fire_ExplosiveTrap) and ConROC:RuneEquipped(Engrave.LockandLoad, "head") and _ExplosiveTrap_RDY and not _LockandLoad_BUFF then
+						tinsert(ConROC.SuggestedSpells, _ExplosiveTrap);
+						_ExplosiveTrap_RDY = false;
+						_LockandLoad_BUFF = true;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Stun_Intimidation) and _Intimidation_RDY and _Pet_summoned and ConROC:TarYou() then
+						tinsert(ConROC.SuggestedSpells, _Intimidation);
+						_Intimidation_RDY = false;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Stun_ScatterShot) and _ScatterShot_RDY and ConROC:IsSpellInRange(_ScatterShot, 'target') and ConROC:TarYou() then
+						tinsert(ConROC.SuggestedSpells, _ScatterShot);
+						_ScatterShot_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
@@ -240,12 +296,16 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 						break;
 					end
 
-					if _RaptorStrike_RDY then
-						tinsert(ConROC.SuggestedSpells, _RaptorStrike);
-						_RaptorStrike_RDY = false;
+					if ConROC:CheckBox(ConROC_SM_Option_WingClip) and _WingClip_RDY and ConROC:HasWindfury() then
+						tinsert(ConROC.SuggestedSpells, _WingClip);
+						_WingClip_DEBUFF = true;
 						_Queue = _Queue + 1;
 						break;
 					end
+
+					tinsert(ConROC.SuggestedSpells, _AutoAttack); --Waiting Spell Icon
+					_Queue = _Queue + 3;
+					break;
 				else
 					if ConROC:CheckBox(ConROC_SM_Role_Melee) then
 						if ConROC:CheckBox(ConROC_SM_Option_AutoShot) and _AutoShot_RDY and not _AutoShot_ACTIVE then
@@ -255,7 +315,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 							break;
 						end
 
-						if ConROC_AoEButton:IsVisible() and _MultiShot_RDY then
+						if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and _MultiShot_RDY then
 							tinsert(ConROC.SuggestedSpells, _MultiShot);
 							_MultiShot_RDY = false;
 							_Queue = _Queue + 1;
@@ -268,97 +328,217 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 							_Queue = _Queue + 1;
 							break;
 						end
-					end
 
-					if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_BUFF and not _target_in_melee then
-						tinsert(ConROC.SuggestedSpells, _HuntersMark);
-						_HuntersMark_BUFF = true;
-						_Queue = _Queue + 1;
+						tinsert(ConROC.SuggestedSpells, _AutoShot); --Waiting Spell Icon
+						_Queue = _Queue + 3;
 						break;
-					end
+					else
+						if not _in_combat then
+							if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_BUFF and not _target_in_melee then
+								tinsert(ConROC.SuggestedSpells, _HuntersMark);
+								_HuntersMark_BUFF = true;
+								_Queue = _Queue + 1;
+								break;
+							end
 
-					if ConROC:CheckBox(ConROC_SM_Sting_Viper) and _ViperSting_RDY and not _Sting_UP and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
-						tinsert(ConROC.SuggestedSpells, _ViperSting);
-						_Sting_UP = true;
-						_Queue = _Queue + 1;
-						break;
-					end
+							if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and _AimedShot_RDY and currentSpell ~= _AimedShot then
+								tinsert(ConROC.SuggestedSpells, _AimedShot);
+								_AimedShot_RDY = false;
+								_LockandLoad_BUFF = false;
+								_Queue = _Queue + 1;
+								break;
+							end
+						end
 
-					if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and _SerpentSting_RDY and not _Sting_UP and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
-						tinsert(ConROC.SuggestedSpells, _SerpentSting);
-						_Sting_UP = true;
-						_Queue = _Queue + 1;
-						break;
-					end
+						if ConROC:CheckBox(ConROC_SM_Sting_Viper) and _ViperSting_RDY and not _Sting_UP and tarHasMana > 0 and ConROC.lastSpellId ~= _ViperSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+							tinsert(ConROC.SuggestedSpells, _ViperSting);
+							_Sting_UP = true;
+							_Queue = _Queue + 1;
+							break;
+						end
 
-					if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and _ScorpidSting_RDY and not _Sting_UP and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
-						tinsert(ConROC.SuggestedSpells, _ScorpidSting);
-						_Sting_UP = true;
-						_Queue = _Queue + 1;
-						break;
-					end
+						if ConROC:CheckBox(ConROC_SM_Sting_Serpent) and _SerpentSting_RDY and not _Sting_UP and ConROC.lastSpellId ~= _SerpentSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+							tinsert(ConROC.SuggestedSpells, _SerpentSting);
+							_Sting_UP = true;
+							_Queue = _Queue + 1;
+							break;
+						end
 
-					if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and _AimedShot_RDY and currentSpell ~= _AimedShot then
-						tinsert(ConROC.SuggestedSpells, _AimedShot);
-						_AimedShot_RDY = false;
-						_Queue = _Queue + 1;
-						break;
-					end
+						if ConROC:CheckBox(ConROC_SM_Sting_Scorpid) and _ScorpidSting_RDY and not _Sting_UP and ConROC.lastSpellId ~= _ScorpidSting and not ConROC:CreatureType("Mechanical") and not ConROC:CreatureType("Elemental") then
+							tinsert(ConROC.SuggestedSpells, _ScorpidSting);
+							_Sting_UP = true;
+							_Queue = _Queue + 1;
+							break;
+						end
 
-					if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and _MultiShot_RDY then
-						tinsert(ConROC.SuggestedSpells, _MultiShot);
-						_MultiShot_RDY = false;
-						_Queue = _Queue + 1;
-						break;
-					end
+						if ConROC:CheckBox(ConROC_SM_Ability_BestialWrath) and _BestialWrath_RDY and _in_combat and _Pet_summoned then
+							tinsert(ConROC.SuggestedSpells, _BestialWrath);
+							_BestialWrath_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
 
-					if _ArcaneShot_RDY and currentSpell ~= _AimedShot and ((_Mana_Percent >= 50) or _is_moving or ((_Target_Percent_Health <= 5 and ConROC:Raidmob()) or (_Target_Percent_Health <= 20 and not ConROC:Raidmob()))) then
-						tinsert(ConROC.SuggestedSpells, _ArcaneShot);
-						_ArcaneShot_RDY = false;
-						_Queue = _Queue + 1;
-						break;
-					end
+						if ConROC:CheckBox(ConROC_SM_Ability_RapidFire) and _RapidFire_RDY and _in_combat then
+							tinsert(ConROC.SuggestedSpells, _RapidFire);
+							_RapidFire_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
 
-					if ConROC:CheckBox(ConROC_SM_Option_AutoShot) and _AutoShot_RDY and not _AutoShot_ACTIVE then
-						tinsert(ConROC.SuggestedSpells, _AutoShot);
+
+						if ConROC:CheckBox(ConROC_SM_Ability_ChimeraShot) and _ChimeraShot_RDY and (_RapidFire_BUFF or ((_SerpentSting_DEBUFF and _SerpentSting_DUR <= 6) or (_ScorpidSting_DEBUFF and _ScorpidSting_DUR <= 6) or (_ViperSting_DEBUFF and _ViperSting_DUR <= 6))) then
+							tinsert(ConROC.SuggestedSpells, _ChimeraShot);
+							_ChimeraShot_RDY = false;
+							_LockandLoad_BUFF = false;
+							_SerpentSting_DUR = 15;
+							_ScorpidSting_DUR = 15;
+							_ViperSting_DUR = 15;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Ability_KillShot) and _KillShot_RDY and _RapidFire_BUFF then
+							tinsert(ConROC.SuggestedSpells, _KillShot);
+							_KillShot_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Fire_ImmolationTrap) and ConROC:RuneEquipped(Engrave.LockandLoad, "head") and _ImmolationTrap_RDY and not _LockandLoad_BUFF then
+							tinsert(ConROC.SuggestedSpells, _ImmolationTrap);
+							_ImmolationTrap_RDY = false;
+							_LockandLoad_BUFF = true;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Fire_ExplosiveTrap) and ConROC:RuneEquipped(Engrave.LockandLoad, "head") and _ExplosiveTrap_RDY and not _LockandLoad_BUFF then
+							tinsert(ConROC.SuggestedSpells, _ExplosiveTrap);
+							_ExplosiveTrap_RDY = false;
+							_LockandLoad_BUFF = true;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:RuneEquipped(Engrave.LockandLoad, "head") and _FreezingTrap_RDY and not _LockandLoad_BUFF then
+							tinsert(ConROC.SuggestedSpells, _FreezingTrap);
+							_FreezingTrap_RDY = false;
+							_LockandLoad_BUFF = true;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Ability_ChimeraShot) and _ChimeraShot_RDY and _LockandLoad_BUFF then
+							tinsert(ConROC.SuggestedSpells, _ChimeraShot);
+							_LockandLoad_BUFF = false;
+							_SerpentSting_DUR = 15;
+							_ScorpidSting_DUR = 15;
+							_ViperSting_DUR = 15;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Ability_ChimeraShot) and _ChimeraShot_RDY then
+							tinsert(ConROC.SuggestedSpells, _ChimeraShot);
+							_ChimeraShot_RDY = false;
+							_SerpentSting_DUR = 15;
+							_ScorpidSting_DUR = 15;
+							_ViperSting_DUR = 15;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and _AimedShot_RDY and _LockandLoad_BUFF then
+							tinsert(ConROC.SuggestedSpells, _AimedShot);
+							_LockandLoad_BUFF = false;
+							_SerpentSting_DUR = 15;
+							_ScorpidSting_DUR = 15;
+							_ViperSting_DUR = 15;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Ability_KillShot) and _KillShot_RDY then
+							tinsert(ConROC.SuggestedSpells, _KillShot);
+							_KillShot_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Fire_ImmolationTrap) and _ImmolationTrap_RDY then
+							tinsert(ConROC.SuggestedSpells, _ImmolationTrap);
+							_ImmolationTrap_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Fire_ExplosiveTrap) and _ExplosiveTrap_RDY then
+							tinsert(ConROC.SuggestedSpells, _ExplosiveTrap);
+							_ExplosiveTrap_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if ConROC:CheckBox(ConROC_SM_Ability_AimedShot) and _AimedShot_RDY and currentSpell ~= _AimedShot then
+							tinsert(ConROC.SuggestedSpells, _AimedShot);
+							_AimedShot_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_MultiShot)) and _MultiShot_RDY then
+							tinsert(ConROC.SuggestedSpells, _MultiShot);
+							_MultiShot_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_Volley)) and _Volley_RDY then
+							tinsert(ConROC.SuggestedSpells, _Volley);
+							_Volley_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						if _ArcaneShot_RDY and currentSpell ~= _AimedShot and ((_Mana_Percent >= 50) or _is_moving or ((_Target_Percent_Health <= 5 and ConROC:Raidmob()) or (_Target_Percent_Health <= 20 and not ConROC:Raidmob()))) then
+							tinsert(ConROC.SuggestedSpells, _ArcaneShot);
+							_ArcaneShot_RDY = false;
+							_Queue = _Queue + 1;
+							break;
+						end
+
+						tinsert(ConROC.SuggestedSpells, _AutoShot); --Waiting Spell Icon
 						_Queue = _Queue + 3;
 						break;
 					end
 				end
 			else--not SoD
-				if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_BUFF and not _target_in_melee then
-					tinsert(ConROC.SuggestedSpells, _HuntersMark);
-					_HuntersMark_BUFF = true;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if ConROC:CheckBox(ConROC_SM_Stun_Intimidation) and _Intimidation_RDY and _Pet_summoned and ConROC:TarYou() then
-					tinsert(ConROC.SuggestedSpells, _Intimidation);
-					_Intimidation_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
-				if ConROC:CheckBox(ConROC_SM_Stun_ScatterShot) and _ScatterShot_RDY and ConROC:IsSpellInRange(_ScatterShot, 'target') and ConROC:TarYou() then
-					tinsert(ConROC.SuggestedSpells, _ScatterShot);
-					_ScatterShot_RDY = false;
-					_Queue = _Queue + 1;
-					break;
-				end
-
 				if _target_in_melee then
 					_AutoShot_ACTIVE = false;
-					if _Counterattack_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_Counterattack) and _Counterattack_RDY then
 						tinsert(ConROC.SuggestedSpells, _Counterattack);
 						_Counterattack_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
 
-					if _MongooseBite_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_MongooseBite) and _MongooseBite_RDY then
 						tinsert(ConROC.SuggestedSpells, _MongooseBite);
 						_MongooseBite_RDY = false;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Stun_Intimidation) and _Intimidation_RDY and _Pet_summoned and ConROC:TarYou() then
+						tinsert(ConROC.SuggestedSpells, _Intimidation);
+						_Intimidation_RDY = false;
+						_Queue = _Queue + 1;
+						break;
+					end
+
+					if ConROC:CheckBox(ConROC_SM_Stun_ScatterShot) and _ScatterShot_RDY and ConROC:IsSpellInRange(_ScatterShot, 'target') and ConROC:TarYou() then
+						tinsert(ConROC.SuggestedSpells, _ScatterShot);
+						_ScatterShot_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
@@ -370,13 +550,24 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 						break;
 					end
 
-					if _RaptorStrike_RDY then
+					if ConROC:CheckBox(ConROC_SM_Ability_RaptorStrike) and _RaptorStrike_RDY then
 						tinsert(ConROC.SuggestedSpells, _RaptorStrike);
 						_RaptorStrike_RDY = false;
 						_Queue = _Queue + 1;
 						break;
 					end
+
+					tinsert(ConROC.SuggestedSpells, _AutoAttack); --Waiting Spell Icon
+					_Queue = _Queue + 3;
+					break;
 				else
+					if ConROC:CheckBox(ConROC_SM_Ability_HuntersMark) and _HuntersMark_RDY and not _HuntersMark_BUFF then
+						tinsert(ConROC.SuggestedSpells, _HuntersMark);
+						_HuntersMark_BUFF = true;
+						_Queue = _Queue + 1;
+						break;
+					end
+
 					if ConROC:CheckBox(ConROC_SM_Stun_ConcussiveShot) and _ConcussiveShot_RDY and ConROC:TarYou() then
 						tinsert(ConROC.SuggestedSpells, _ConcussiveShot);
 						_ConcussiveShot_RDY = false;
@@ -433,7 +624,7 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 						break;
 					end
 
-					if ConROC_AoEButton:IsVisible() and _Volley_RDY then
+					if (ConROC_AoEButton:IsVisible() and ConROC:CheckBox(ConROC_SM_Ability_Volley)) and _Volley_RDY then
 						tinsert(ConROC.SuggestedSpells, _Volley);
 						_Volley_RDY = false;
 						_Queue = _Queue + 1;
@@ -447,11 +638,9 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 						break;
 					end
 
-					if ConROC:CheckBox(ConROC_SM_Option_AutoShot) and _AutoShot_RDY and not _AutoShot_ACTIVE then
-						tinsert(ConROC.SuggestedSpells, _AutoShot);
-						_Queue = _Queue + 3;
-						break;
-					end
+					tinsert(ConROC.SuggestedSpells, _AutoShot); --Waiting Spell Icon
+					_Queue = _Queue + 3;
+					break;
 				end
 			end
 
@@ -518,9 +707,22 @@ return nil;
 end
 
 function ConROC:JustCasted(spellID)
-    if spellID == (ids.Ability.AutoShot or ids.Ability.SerpentSting) then
+    if spellID == (_AutoShot or Ability.SerpentSting) then
         _AutoShot_ACTIVE = true;
-	else
-        _AutoShot_ACTIVE = false;
     end
+end
+
+function ConROC:HasWindfury()
+	local _Windfury_Present = false;
+	local _Windfury_IDs = {2636,3785,3786,3787,7141};
+	local _has_Imbue, _, _, _Imbuement = GetWeaponEnchantInfo();
+	if _has_Imbue then
+		for _, v in pairs(_Windfury_IDs) do
+			if _Imbuement == v then
+				_Windfury_Present = true;
+			end
+		end
+	end
+
+	return _Windfury_Present;
 end

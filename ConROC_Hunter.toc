@@ -1,5 +1,5 @@
 ## Title:-|cffFFFFFFConROC|r- |cffABD473Hunter|r
-## Version: 1.15.19
+## Version: 1.15.20
 ## Author: Vae
 ## Interface: 11505
 ## SavedVariablesPerCharacter: ConROCHunterSpells

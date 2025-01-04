@@ -31,7 +31,6 @@ ids.Ability = {
 --Marksmanship
 	AimedShot = 19434,
 	ArcaneShot = 3044,
-	AutoShot = 75,
 	ConcussiveShot = 5116,
 	DistractingShot = 20736,
 	Flare = 1543,
@@ -53,6 +52,7 @@ ids.Ability = {
 	FeignDeath = 5384,
 	FreezingTrap = 1499,
 	FrostTrap = 13809,
+	FrostTrapSoD = 409520, -- Trap Launcher
 	MongooseBite = 1495,
 	RaptorStrike = 2973,
 	TrackBeasts = 1494,
@@ -127,6 +127,7 @@ ids.Rank = {
 	SerpentStingRank6 = 13553,
 	SerpentStingRank7 = 13554,
 	SerpentStingRank8 = 13555,
+	SerpentStingRank9 = 25295,
 	TrueshotAuraRank1 = 19506,
 	TrueshotAuraRank2 = 20905,
 	TrueshotAuraRank3 = 20906,
@@ -146,14 +147,25 @@ ids.Rank = {
 	ExplosiveTrapRank1 = 13813,
 	ExplosiveTrapRank2 = 14316,
 	ExplosiveTrapRank3 = 14317,
+	ExplosiveTrapSoDRank1 = 409532, -- Trap Launcher
+	ExplosiveTrapSoDRank2 = 409534,
+	ExplosiveTrapSoDRank3 = 409535,
 	ImmolationTrapRank1 = 13795,
 	ImmolationTrapRank2 = 14302,
 	ImmolationTrapRank3 = 14303,
 	ImmolationTrapRank4 = 14304,
 	ImmolationTrapRank5 = 14305,
+	ImmolationTrapSoDRank1 = 409521, -- Trap Launcher
+	ImmolationTrapSoDRank2 = 409524,
+	ImmolationTrapSoDRank3 = 409526,
+	ImmolationTrapSoDRank4 = 409528,
+	ImmolationTrapSoDRank5 = 409530,
 	FreezingTrapRank1 = 1499,
 	FreezingTrapRank2 = 14310,
 	FreezingTrapRank3 = 14311,
+	FreezingTrapSoDRank1 = 409510, -- Trap Launcher
+	FreezingTrapSoDRank2 = 409512,
+	FreezingTrapSoDRank3 = 409519,
 	MongooseBiteRank1 = 1495,
 	MongooseBiteRank2 = 14269,
 	MongooseBiteRank3 = 14270,
@@ -166,12 +178,23 @@ ids.Rank = {
 	RaptorStrikeRank6 = 14264,
 	RaptorStrikeRank7 = 14265,
 	RaptorStrikeRank8 = 14266,
+	RaptorStrikeSoDRank1 = 415335, -- Melee Specialist
+	RaptorStrikeSoDRank2 = 415336,
+	RaptorStrikeSoDRank3 = 415337,
+	RaptorStrikeSoDRank4 = 415338,
+	RaptorStrikeSoDRank5 = 415340,
+	RaptorStrikeSoDRank6 = 415341,
+	RaptorStrikeSoDRank7 = 415342,
+	RaptorStrikeSoDRank8 = 415343,
 	WingClipRank1 = 2974,
 	WingClipRank2 = 14267,
 	WingClipRank3 = 14268,
 	WyvernStingRank1 = 19386,
 	WyvernStingRank2 = 24132,
 	WyvernStingRank3 = 24133,
+	WyvernStrikeRank1 = 458436,
+	WyvernStrikeRank3 = 458481,
+	WyvernStrikeRank4 = 458482,
 }
 ids.BeastMastery_Talent = {
 	ImprovedAspectoftheMonkey = 1,
@@ -226,9 +249,17 @@ ids.Survival_Talent = {
 	MonsterSlaying = 16,
 }
 ids.Engrave = {
+	--Head--
+	LockandLoad = 6994,
+	--Waist--
 	MeleeSpecialist = 6998,
+	--Legs--
+	SniperTraining = 6995,
+	--Feet--
+	TrapLauncher = 6895,
 }
 ids.Runes = {
+	AspectoftheFalcon = 469145,
 	AspectoftheViper = 415423,
 	HeartoftheLion = 409580, --buff
 	LoneWolf = 415370,  --passive
@@ -240,19 +271,10 @@ ids.Runes = {
 	FlankingStrike = 415320, --buffs stack up to 3 times
 	KillCommand = 409379,
 	KillShot = 409593,
-	RaptorStrikeRank1 = 415335, -- MeleeSpecialist
-	RaptorStrikeRank2 = 415336,
-	RaptorStrikeRank3 = 415337,
-	RaptorStrikeRank4 = 415338,
-	RaptorStrikeRank5 = 415340,
-	RaptorStrikeRank6 = 415341,
-	RaptorStrikeRank7 = 415342,
-	RaptorStrikeRank8 = 415343,
+	RaptorStrike = 415335, -- MeleeSpecialist
+	WyvernStrike = 458436,
 
 	SerpentSpread = 425738, --passive
-	SniperTraining = 415399, --passive
-
-	TrapLauncher = 409541, --Phase 2 - Passive
 }
 --Pet
 ids.Pet = {
@@ -261,6 +283,7 @@ ids.Pet = {
 -- Auras
 ids.Buff = {
 	HeartoftheLion = 409583,
+	LockandLoad = 415414,
 	RaptorFury = 415362,
 }
 ids.Debuff = {
@@ -306,7 +329,8 @@ function ConROC:UpdateSpellID()
 	elseif IsSpellKnown(ids.Rank.ScorpidStingRank3) then ids.Ability.ScorpidSting = ids.Rank.ScorpidStingRank3;
 	elseif IsSpellKnown(ids.Rank.ScorpidStingRank2) then ids.Ability.ScorpidSting = ids.Rank.ScorpidStingRank2; end
 
-	if IsSpellKnown(ids.Rank.SerpentStingRank8) then ids.Ability.SerpentSting = ids.Rank.SerpentStingRank8;
+	if IsSpellKnown(ids.Rank.SerpentStingRank9) then ids.Ability.SerpentSting = ids.Rank.SerpentStingRank9;
+	elseif IsSpellKnown(ids.Rank.SerpentStingRank8) then ids.Ability.SerpentSting = ids.Rank.SerpentStingRank8;
 	elseif IsSpellKnown(ids.Rank.SerpentStingRank7) then ids.Ability.SerpentSting = ids.Rank.SerpentStingRank7;
 	elseif IsSpellKnown(ids.Rank.SerpentStingRank6) then ids.Ability.SerpentSting = ids.Rank.SerpentStingRank6;
 	elseif IsSpellKnown(ids.Rank.SerpentStingRank5) then ids.Ability.SerpentSting = ids.Rank.SerpentStingRank5;
@@ -327,42 +351,65 @@ function ConROC:UpdateSpellID()
 	if IsSpellKnown(ids.Rank.CounterattackRank3) then ids.Ability.Counterattack = ids.Rank.CounterattackRank3;
 	elseif IsSpellKnown(ids.Rank.CounterattackRank2) then ids.Ability.Counterattack = ids.Rank.CounterattackRank2; end
 
-	if IsSpellKnown(ids.Rank.ExplosiveTrapRank3) then ids.Ability.ExplosiveTrap = ids.Rank.ExplosiveTrapRank3;
-	elseif IsSpellKnown(ids.Rank.ExplosiveTrapRank2) then ids.Ability.ExplosiveTrap = ids.Rank.ExplosiveTrapRank2; end
+	if IsSpellKnown(ids.Rank.ExplosiveTrapRank3) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.ExplosiveTrap = ids.Rank.ExplosiveTrapSoDRank3;
+		else ids.Ability.ExplosiveTrap = ids.Rank.ExplosiveTrapRank3; end
+	elseif IsSpellKnown(ids.Rank.ExplosiveTrapRank2) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.ExplosiveTrap = ids.Rank.ExplosiveTrapSoDRank2;
+		else ids.Ability.ExplosiveTrap = ids.Rank.ExplosiveTrapRank2; end
+	end
 
-	if IsSpellKnown(ids.Rank.ImmolationTrapRank5) then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank5;
-	elseif IsSpellKnown(ids.Rank.ImmolationTrapRank4) then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank4;
-	elseif IsSpellKnown(ids.Rank.ImmolationTrapRank3) then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank3;
-	elseif IsSpellKnown(ids.Rank.ImmolationTrapRank2) then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank2; end
+	if IsSpellKnown(ids.Rank.FreezingTrapRank3) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.FreezingTrap = ids.Rank.FreezingTrapSoDRank3;
+		else ids.Ability.FreezingTrap = ids.Rank.FreezingTrapRank3; end
+	elseif IsSpellKnown(ids.Rank.FreezingTrapRank2) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.FreezingTrap = ids.Rank.FreezingTrapSoDRank2;
+		else ids.Ability.FreezingTrap = ids.Rank.FreezingTrapRank2; end
+	end
 
-	if IsSpellKnown(ids.Rank.FreezingTrapRank3) then ids.Ability.FreezingTrap = ids.Rank.FreezingTrapRank3;
-	elseif IsSpellKnown(ids.Rank.FreezingTrapRank2) then ids.Ability.FreezingTrap = ids.Rank.FreezingTrapRank2; end
+	if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.FrostTrap = ids.Ability.FrostTrapSoD; end
+
+	if IsSpellKnown(ids.Rank.ImmolationTrapRank5) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapSoDRank5;
+		else ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank5; end
+	elseif IsSpellKnown(ids.Rank.ImmolationTrapRank4) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapSoDRank4;
+		else ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank4; end
+	elseif IsSpellKnown(ids.Rank.ImmolationTrapRank3) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapSoDRank3;
+		else ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank3; end
+	elseif IsSpellKnown(ids.Rank.ImmolationTrapRank2) then
+		if ConROC:RuneEquipped(ids.Engrave.TrapLauncher, "feet") then ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapSoDRank2;
+		else ids.Ability.ImmolationTrap = ids.Rank.ImmolationTrapRank2; end
+	end
 
 	if IsSpellKnown(ids.Rank.MongooseBiteRank4) then ids.Ability.MongooseBite = ids.Rank.MongooseBiteRank4;
 	elseif IsSpellKnown(ids.Rank.MongooseBiteRank3) then ids.Ability.MongooseBite = ids.Rank.MongooseBiteRank3;
 	elseif IsSpellKnown(ids.Rank.MongooseBiteRank2) then ids.Ability.MongooseBite = ids.Rank.MongooseBiteRank2; end
 
 	if IsSpellKnown(ids.Rank.RaptorStrikeRank8) then
-		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank8;
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeSoDRank8;
 		else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank8; end
 	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank7) then
-		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank7;
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeSoDRank7;
 		else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank7; end
 	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank6) then
-		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank6;
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeSoDRank6;
 	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank6; end
 	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank5) then
-		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank5;
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeSoDRank5;
 	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank5; end
 	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank4) then
-		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank4;
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeSoDRank4;
 	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank4; end
 	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank3) then
-		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank3;
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeSoDRank3;
 	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank3; end
 	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank2) then
-		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrikeRank2;
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeSoDRank2;
 	 	else ids.Ability.RaptorStrike = ids.Rank.RaptorStrikeRank2; end
+	elseif IsSpellKnown(ids.Rank.RaptorStrikeRank1) then
+		if ConROC:RuneEquipped(ids.Engrave.MeleeSpecialist, "waist") then ids.Ability.RaptorStrike = ids.Runes.RaptorStrike; end
 	end
 
 	if IsSpellKnown(ids.Rank.WingClipRank3) then ids.Ability.WingClip = ids.Rank.WingClipRank3;
@@ -370,6 +417,9 @@ function ConROC:UpdateSpellID()
 
 	if IsSpellKnown(ids.Rank.WyvernStingRank3) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank3;
 	elseif IsSpellKnown(ids.Rank.WyvernStingRank2) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank2; end
+
+	if IsSpellKnown(ids.Rank.WyvernStingRank3) then ids.Ability.WyvernStrike = ids.Rank.WyvernStrikeRank3;
+	elseif IsSpellKnown(ids.Rank.WyvernStingRank2) then ids.Ability.WyvernStrike = ids.Rank.WyvernStrikeRank2; end
 
 	if IsSpellKnown(ids.Rank.AspectoftheWildRank2) then ids.Ability.AspectoftheWild = ids.Rank.AspectoftheWildRank2; end
 

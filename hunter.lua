@@ -192,6 +192,13 @@ function ConROC.Hunter.Damage(_, timeShift, currentSpell, gcd)
 	repeat
 		while(true) do
 			if ConROC.Seasons.IsSoD then
+				if ConROC:CheckBox(ConROC_SM_Fire_ImmolationTrap) and _ImmolationTrap_RDY then
+					tinsert(ConROC.SuggestedSpells, _ImmolationTrap);
+					_ImmolationTrap_RDY = false;
+					_Queue = _Queue + 1;
+					break;
+				end
+
 				if ConROC:CheckBox(ConROC_SM_Ability_HeartoftheLion) and _HeartoftheLion_RDY and not _HeartoftheLion_FORM then
 					tinsert(ConROC.SuggestedSpells, _HeartoftheLion);
 					_HeartoftheLion_FORM = true;

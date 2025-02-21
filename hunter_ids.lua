@@ -257,6 +257,7 @@ ids.Engrave = {
 	SniperTraining = 6995,
 	--Feet--
 	TrapLauncher = 6895,
+	WyvernStrike = 6991,
 }
 ids.Runes = {
 	AspectoftheFalcon = 469145,
@@ -415,11 +416,16 @@ function ConROC:UpdateSpellID()
 	if IsSpellKnown(ids.Rank.WingClipRank3) then ids.Ability.WingClip = ids.Rank.WingClipRank3;
 	elseif IsSpellKnown(ids.Rank.WingClipRank2) then ids.Ability.WingClip = ids.Rank.WingClipRank2; end
 
-	if IsSpellKnown(ids.Rank.WyvernStingRank3) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank3;
-	elseif IsSpellKnown(ids.Rank.WyvernStingRank2) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank2; end
+	if ConROC.Seasons.IsSoD and ConROC:RuneEquipped(ids.Engrave.WyvernStrike, "feet") then
+		if IsSpellKnown(ids.Rank.WyvernStingRank3) then ids.Runes.WyvernStrike = ids.Rank.WyvernStrikeRank3;
+		elseif IsSpellKnown(ids.Rank.WyvernStingRank2) then ids.Runes.WyvernStrike = ids.Rank.WyvernStrikeRank2;
+		elseif IsSpellKnown(ids.Rank.WyvernStingRank1) then ids.Runes.WyvernStrike = ids.Rank.WyvernStrikeRank1; end
+	else
+		if IsSpellKnown(ids.Rank.WyvernStingRank3) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank3;
+		elseif IsSpellKnown(ids.Rank.WyvernStingRank2) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank2;
+		elseif IsSpellKnown(ids.Rank.WyvernStingRank1) then ids.Ability.WyvernSting = ids.Rank.WyvernStingRank1; end
+	end
 
-	if IsSpellKnown(ids.Rank.WyvernStingRank3) then ids.Ability.WyvernStrike = ids.Rank.WyvernStrikeRank3;
-	elseif IsSpellKnown(ids.Rank.WyvernStingRank2) then ids.Ability.WyvernStrike = ids.Rank.WyvernStrikeRank2; end
 
 	if IsSpellKnown(ids.Rank.AspectoftheWildRank2) then ids.Ability.AspectoftheWild = ids.Rank.AspectoftheWildRank2; end
 
